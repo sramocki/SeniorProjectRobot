@@ -1,14 +1,1 @@
-Project Requirements (FURPS+):
-1.	The application shall allow the leader vehicle to move forward by remote control
-2.	The application shall allow the leader vehicle to move backwards by remote control
-3.	The application shall allow the leader vehicle to turn left by remote control
-4.	The application shall allow the leader vehicle to turn right by remote control
-5.	The application shall be able to transmit position changes to the follower vehicle
-6.	The application shall allow the follower vehicle to interpret position changes into left position motion.
-7.	The application shall allow the follower vehicle to interpret position changes into right position motion.
-8.	The application shall allow the follower vehicle to interpret position changes into forward position motion.
-9.	The application shall allow the follower vehicle to interpret position changes into backwards position motion.
-10.	The application shall prevent the follower from colliding with the leader vehicle
-11.	The application shall allow the leader vehicle to recieve input from a remote control
-12. The application shall be able to handle a situation where the follower vehicle loses line of sight with the leader vehicle.
-13.
+
