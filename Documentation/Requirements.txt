@@ -9,4 +9,5 @@ Project Requirements (FURPS+):
 8.	The application shall allow the follower vehicle to interpret position changes into forward position motion.
 9.	The application shall allow the follower vehicle to interpret position changes into backwards position motion.
 10.	The application shall prevent the follower from colliding with the leader vehicle
-11.	
+11.	The application shall allow the leader vehicle to recieve input from a remote control
+12. 
