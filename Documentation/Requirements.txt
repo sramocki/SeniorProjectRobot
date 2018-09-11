@@ -1,1 +1,2 @@
-
+The application shall allow the leader vehicle to recieve input from a remote control
+The application shall be able to handle a situation where the follower vehicle loses line of sight with the leader vehicle.
