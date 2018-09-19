@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from registration import Ui_RegistrationWindow
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -81,6 +81,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionRegister_Vehicle = QtWidgets.QAction(MainWindow)
         self.actionRegister_Vehicle.setObjectName("actionRegister_Vehicle")
+        self.actionRegister_Vehicle.triggered.connect(self.register_window)
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
         self.actionAbout = QtWidgets.QAction(MainWindow)
@@ -94,6 +95,12 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+                
+    def register_window(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_RegistrationWindow()
+        self.ui.setupUi(self.window)
+        self.window.show()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

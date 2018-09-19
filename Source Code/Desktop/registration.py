@@ -26,6 +26,7 @@ class Ui_RegistrationWindow(object):
         self.scanButton = QtWidgets.QPushButton(self.centralwidget)
         self.scanButton.setGeometry(QtCore.QRect(20, 60, 101, 23))
         self.scanButton.setObjectName("scanButton")
+        self.scanButton.clicked.connect(self.deviceScan)
         self.progressScan = QtWidgets.QProgressBar(self.centralwidget)
         self.progressScan.setGeometry(QtCore.QRect(270, 60, 118, 23))
         self.progressScan.setProperty("value", 24)
@@ -90,6 +91,15 @@ class Ui_RegistrationWindow(object):
 
         self.retranslateUi(RegistrationWindow)
         QtCore.QMetaObject.connectSlotsByName(RegistrationWindow)
+        
+    def deviceScan(self):
+        v = Vehicle("127.0.0.1","60-5B-9A-5B-92-05","Default","1%")
+        self.deviceTable.rowCountChanged(1,2)
+        #self.deviceTable.setCellWidget(0,1,"test")
+        self.macField.setText(v.macAddress)
+        self.roleField.setText(v.role)
+        self.batteryField.setText(v.batteryLife)
+    
 
     def retranslateUi(self, RegistrationWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -119,4 +129,12 @@ if __name__ == "__main__":
     ui.setupUi(RegistrationWindow)
     RegistrationWindow.show()
     sys.exit(app.exec_())
+    
+class Vehicle(object):
+  def __init__(self, ipAddress, macAddress,role,batteryLife):
+    self.ipAddress = ipAddress
+    self.macAddress = macAddress
+    self.role = role
+    self.batteryLife = batteryLife
+
 
