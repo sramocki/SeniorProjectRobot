@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RobotClient"
+        KeyDown="Key_down"
+        KeyUp="Key_up"
         mc:Ignorable="d"
         Title="Robot Client" Height="800" Width="800">
     <Grid>
@@ -20,10 +22,10 @@
             </MenuItem>
         </Menu>
         <Slider ValueChanged="Slider_ValueChanged" Thumb.DragStarted="Slider_DragStarted" Thumb.DragCompleted="Slider_DragCompleted" Orientation="Vertical" Minimum="0" Maximum="5" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="232,396,0,0" VerticalAlignment="Top" Width="31" Height="106" RenderTransformOrigin="-10.968,0.443"/>
-        <Button Click="ButtonPress_Event" Content="Forward" HorizontalAlignment="Left" Margin="378,396,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button Click="ButtonPress_Event" Content="Backwards" HorizontalAlignment="Left" Margin="378,482,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button Click="ButtonPress_Event" Content="Left" HorizontalAlignment="Left" Margin="297,440,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button Click="ButtonPress_Event" Content="Right" HorizontalAlignment="Left" Margin="458,440,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="1.6,2.75"/>
+        <RepeatButton Click="ButtonPress_Event" Content="Forward" HorizontalAlignment="Left" Margin="378,396,0,0" VerticalAlignment="Top" Width="75"/>
+        <RepeatButton Click="ButtonPress_Event" Content="Backwards" HorizontalAlignment="Left" Margin="378,482,0,0" VerticalAlignment="Top" Width="75"/>
+        <RepeatButton Click="ButtonPress_Event" Content="Left" HorizontalAlignment="Left" Margin="297,440,0,0" VerticalAlignment="Top" Width="75"/>
+        <RepeatButton Click="ButtonPress_Event" Content="Right" HorizontalAlignment="Left" Margin="458,440,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="1.6,2.75"/>
         <MediaElement Margin="297,59,259,466" OpacityMask="#FFFD1313"></MediaElement>
         <TextBlock Name="IPTextBlock" x:FieldModifier="public" HorizontalAlignment="Left" Margin="689,82,0,0" TextWrapping="Wrap" Text="Empty!!" VerticalAlignment="Top" RenderTransformOrigin="0.075,1.062"/>
         <Label Content="Leader IP:" HorizontalAlignment="Left" Margin="615,77,0,0" VerticalAlignment="Top"/>
