@@ -15,7 +15,6 @@
             <RowDefinition Height="297*"/>
             <RowDefinition Height="122*"/>
         </Grid.RowDefinitions>
-        <Button Click="ExampleButton" Content="Set IP" HorizontalAlignment="Left" Margin="169.143,66,0,0" VerticalAlignment="Top" Width="75" Grid.Row="1" Grid.Column="1"/>
         <Button Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="43,34,0,0" VerticalAlignment="Top" Width="100" Height="29"/>
         <Label x:Name="macLabel" Content="Device Information" HorizontalAlignment="Left" Margin="5.143,45,0,0" VerticalAlignment="Top" Grid.Column="1"/>
         <ListBox x:Name="ipList" HorizontalAlignment="Left" Height="172" Margin="31,125,0,0" VerticalAlignment="Top" Width="177" SelectionChanged="ipList_SelectionChanged"/>
