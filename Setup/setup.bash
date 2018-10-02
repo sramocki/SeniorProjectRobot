@@ -30,7 +30,7 @@ sudo apt-get install python-opencv
 sudo apt-get install libjpeg8-dev
 
 # gRPC
-virtualenv --python=python3.7 -v grpc-net
+virtualenv --python=python3 -v grpc-net
 cd grpc-net
 source ./bin/activate
 sudo python -m pip install grpcio
