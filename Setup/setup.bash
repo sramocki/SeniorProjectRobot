@@ -8,8 +8,8 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 
 # Switch to root
-homedir = $HOME
-echo Default password for root is 'raspberry'
+homedir="/home/pi"
+echo "Default password for root is 'raspberry'"
 su root
 cd $homedir
 
