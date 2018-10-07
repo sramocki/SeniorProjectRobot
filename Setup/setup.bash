@@ -9,16 +9,9 @@ sudo apt-get dist-upgrade
 
 # Switch to root
 homedir="/home/pi"
-echo "Default password for root is 'raspberry'"
-su root
-cd $homedir
+sudo su
 
 # Install Dependencies
-
-# VirtualEnv
-sudo pip install virtualenv
-sudo pip install virtualenvwrapper
-virtualenv venv && source venv/bin/activate
 
 # SMBus/I2C
 sudo apt-get install python-smbus i2c-tools
@@ -29,19 +22,24 @@ sudo apt-get install python-opencv
 # LibJPEG8
 sudo apt-get install libjpeg8-dev
 
-# gRPC
-virtualenv --python=python3 -v grpc-net
-cd grpc-net
-source ./bin/activate
-sudo python -m pip install grpcio
-sudo python -m pip install grcpio-tools googleapis-common-protos
-
 # Link Git
 cd $homedir 
 sudo apt-get install git
 git clone --recursive https://github.com/sramocki/SeniorProjectRobot.git
 cd SeniorProjectRobot
 git pull
+
+# VirtualEnv
+sudo pip install virtualenv
+sudo pip install virtualenvwrapper
+virtualenv venv && source venv/bin/activate
+
+# gRPC
+virtualenv --python=python3 -v grpc-net
+cd grpc-net
+source ./bin/activate
+sudo python -m pip install grpcio
+sudo python -m pip install grcpio-tools googleapis-common-protos
 
 # Reboot system to finish all installations
 sudo reboot
