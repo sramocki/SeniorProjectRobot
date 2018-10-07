@@ -5,30 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RobotClient"
         mc:Ignorable="d"
-        Title="Register Vehicles" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="163*"/>
-            <ColumnDefinition Width="101*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="297*"/>
-            <RowDefinition Height="122*"/>
-        </Grid.RowDefinitions>
-        <Button Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="43,34,0,0" VerticalAlignment="Top" Width="100" Height="29"/>
-        <Label x:Name="macLabel" Content="Device Information" HorizontalAlignment="Left" Margin="5.143,45,0,0" VerticalAlignment="Top" Grid.Column="1"/>
-        <ListBox x:Name="ipList" HorizontalAlignment="Left" Height="172" Margin="31,125,0,0" VerticalAlignment="Top" Width="177" SelectionChanged="ipList_SelectionChanged"/>
-        <TextBox x:Name="macAddressBox" HorizontalAlignment="Left" Height="23" Margin="169.143,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
-        <Label x:Name="roleLabel" Content="Current Role:" HorizontalAlignment="Left" Margin="73.143,107,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.116,0.906" Grid.Column="1"/>
-        <TextBox x:Name="roleBox" HorizontalAlignment="Left" Height="23" Margin="169.143,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
-        <Label x:Name="ipLabel" Content="Device List (IP)" HorizontalAlignment="Left" Margin="43,89,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="batteryLabel" Content="Battery Level:" Grid.Column="1" HorizontalAlignment="Left" Margin="72,162,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="batteryBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="169,162,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button Click="LeaderButton" Content="Set Leader" Grid.Column="1" HorizontalAlignment="Left" Margin="21,224,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button Click="DefaultRoleButton" Content="Set Default" Grid.Column="1" HorizontalAlignment="Left" Margin="122,224,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button Click="FollowerRoleButton" Content="Set Follower" Grid.Column="1" HorizontalAlignment="Left" Margin="214,224,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="returnHomeButton" Content="Return Home" Grid.Column="1" HorizontalAlignment="Left" Margin="72,271,0,0" VerticalAlignment="Top" Width="80"/>
-        <Button x:Name="shutdownButton" Content="Shutdown" Grid.Column="1" HorizontalAlignment="Left" Margin="169,271,0,0" VerticalAlignment="Top" Width="75"/>
+        Title="Register Vehicles" Height="450" Width="300
+        ">
+    <Grid Margin="0,0,0,0">
+        <Button Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="98,26,0,0" VerticalAlignment="Top" Width="100" Height="29"/>
+        <ListBox Name="deviceList" HorizontalAlignment="Left" Height="172" Margin="57,122,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="deviceList_SelectionChanged"/>
+        <Label Name="ipLabel" Content="Device List" HorizontalAlignment="Left" Margin="114,91,0,0" VerticalAlignment="Top"/>
+        <Button Content="Connect" Click="TryConnect" HorizontalAlignment="Left" Margin="98,365,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.481,1.932"/>
+        <TextBox Name="SelectedIP_Box" HorizontalAlignment="Left" Height="23" Margin="78,315,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.121,0.121"/>
 
     </Grid>
 </Window>

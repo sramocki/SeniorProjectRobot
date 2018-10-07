@@ -21,15 +21,16 @@ namespace RobotClient
     /// </summary>
     public partial class Registration : Window
     {
-        List<String[]> ipStringList = new List<string[]>();
+        List<String[]> deviceStringList = new List<string[]>();
         MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+        private String selectedIP;
         public Registration()
         {
             InitializeComponent();
-            ipList.ItemsSource = null;
+            deviceList.ItemsSource = null;
 
-            ipStringList = mainWindow.LeaderIpList;
-            ipList.ItemsSource = ipStringList.Select(array => array.FirstOrDefault());
+            
+            deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
         }
 
 
@@ -37,7 +38,11 @@ namespace RobotClient
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
 
-            ipStringList.Clear();
+            //Send Packet to all cars to be idle
+
+            deviceStringList.Clear();
+            
+            mainWindow.deviceListMain.Clear();
             var defaultGateway = "";
             foreach (NetworkInterface curInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
@@ -52,99 +57,60 @@ namespace RobotClient
 
             defaultGateway = defaultGateway.Substring(0, (defaultGateway.Length - 1));
             Console.WriteLine(defaultGateway);
-            
-            for (int i = 1; i < 20; i++)
+
+            //adjust as needed
+            for (int i = 10; i < 20; i++)
             {
-                Ping p = new System.Net.NetworkInformation.Ping();
+                Ping p = new Ping();
                 PingReply rep = p.Send(defaultGateway + i);
-                if (rep.Status == IPStatus.Success)
+                if (rep == null || rep.Status != IPStatus.Success) continue;
+                Console.WriteLine("IP Found at " + defaultGateway + i);
+                string deviceName;
+                try
                 {
-                    Console.WriteLine("IP Found at " + defaultGateway + i);
-                    String deviceName = "";
-                    try
-                    {
-                       
-                        deviceName = Dns.GetHostEntry(defaultGateway + i).HostName.ToString();
-                        
-                    }
-                    catch
-                    {
-                        deviceName = "unknown";
 
-                    }
+                    deviceName = Dns.GetHostEntry(defaultGateway + i).HostName;
 
-                    Console.WriteLine("Device Name is: " + deviceName);
-
-                    ipStringList.Add(new String[] { defaultGateway + i, deviceName, "Default" });
                 }
+                catch
+                {
+                    deviceName = "unknown"+i;
+
+                }
+
+                Console.WriteLine("Device Name is: " + deviceName);
+
+                deviceStringList.Add(new[] { deviceName,defaultGateway + i, "Default" });
             }
 
 
-            ipList.ItemsSource = ipStringList.Select(array => array.FirstOrDefault());
-            mainWindow.LeaderIpList = ipStringList;
+            deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
 
         }
 
-        private void ipList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
 
-                String ipString = ipList.SelectedItem.ToString();
+            String deviceString = deviceList.SelectedItem.ToString();
+            Console.WriteLine(deviceString);
 
-            int index = ipStringList.FindIndex(array => array[0] == ipString);
-            //Console.WriteLine(index); Line used for Testing
-
-            macAddressBox.Text= ipStringList[index][1].ToString();
-            roleBox.Text = ipStringList[index][2].ToString();
-
-
-        }
-        private void LeaderButton(object sender, RoutedEventArgs e)
-        {
-            String ipString = ipList.SelectedItem.ToString();
-
-            int index = ipStringList.FindIndex(array => array[0] == ipString);
-
-            ipStringList[index][2] = "Leader";
-
-            roleBox.Text = ipStringList[index][2].ToString();
-
-            mainWindow.IPTextBlock.Text = ipList.SelectedItem.ToString();
-            mainWindow.LeaderIpList = ipStringList;
-
+            int index = deviceStringList.FindIndex(array => array[0] == deviceString);
+            SelectedIP_Box.Text = deviceStringList[index][1].ToString();
+            Console.WriteLine(index);
 
         }
 
-        private void FollowerRoleButton(object sender, RoutedEventArgs e)
+        private void TryConnect(object sender, RoutedEventArgs e)
         {
+            //try connect to selectedIP
+            //if acknowledged, add to list on mainView
+            String deviceString = deviceList.SelectedItem.ToString();
 
-            String ipString = ipList.SelectedItem.ToString();
+            int index = deviceStringList.FindIndex(array => array[0] == deviceString);
 
-            int index = ipStringList.FindIndex(array => array[0] == ipString);
-
-            ipStringList[index][2] = "Follower";
-
-            roleBox.Text = ipStringList[index][2].ToString();
-            // mainWindow.IPTextBlock.Text = ipList.SelectedItem.ToString();
-            // mainWindow.FollowerIP = ipList.SelectedItem.ToString();
-            mainWindow.LeaderIpList = ipStringList;
-
-        }
-
-        private void DefaultRoleButton(object sender, RoutedEventArgs e)
-        {
-
-            String ipString = ipList.SelectedItem.ToString();
-
-            int index = ipStringList.FindIndex(array => array[0] == ipString);
-
-            ipStringList[index][2] = "Default";
-
-            roleBox.Text = ipStringList[index][2].ToString();
-            // mainWindow.IPTextBlock.Text = ipList.SelectedItem.ToString();
-            // mainWindow.FollowerIP = ipList.SelectedItem.ToString();
-            mainWindow.LeaderIpList = ipStringList;
-
+            mainWindow.deviceListMain.Add(new[] { deviceStringList[index][0], deviceStringList[index][1], deviceStringList[index][2] });
+            mainWindow.deviceListMn.ItemsSource = mainWindow.deviceListMain.Select(array => array.FirstOrDefault());
         }
     }
 
