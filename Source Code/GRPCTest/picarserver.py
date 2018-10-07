@@ -9,7 +9,7 @@ import picar_pb2
 import picar_pb2_grpc
 
 class PiCarServicer(picar_pb2_grpc.PiCarServicer):
-	"""Provides methods that implement functionality of route guide server."""
+	"""Provides methods that implement functionality of PiCar server."""
 	
 	def __init__(self):
 		self.mode = 'IDLE'
