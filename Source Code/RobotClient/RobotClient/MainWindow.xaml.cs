@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -13,8 +13,8 @@ namespace RobotClient
 
     public partial class MainWindow : Window
     {
-
-        public List<String[]> LeaderIpList = new List<string[]>();
+        
+        public List<String[]> deviceListMain = new List<string[]>();
         public string LeaderIp { set; get; }
         public string FollowerIP { set; get; }
         private bool _keyHold = false;
@@ -182,5 +182,34 @@ namespace RobotClient
                 MessageBoxResult.Yes)
                 Application.Current.Shutdown();
         }
+
+        private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+
+            String deviceString = deviceListMn.SelectedItem.ToString();
+            Console.WriteLine(deviceString);
+
+            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
+            ipBox.Text = deviceListMain[index][1].ToString();
+            deviceStatus.Text = deviceListMain[index][2].ToString();
+            Console.WriteLine(index);
+
+        }
+
+        private void SetLeader(object sender, RoutedEventArgs e)
+        {
+
+            String deviceString = deviceListMn.SelectedItem.ToString();
+
+            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
+
+            deviceListMain[index][2] = "Leader";
+            
+
+            deviceStatus.Text = deviceListMain[index][2].ToString();
+        }
     }
+
+   
 }
