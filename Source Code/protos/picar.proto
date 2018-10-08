@@ -1,4 +1,8 @@
 syntax = "proto3";
+package SeniorProjectRobot;
+
+option csharp_namespace = "RobotClient";
+
 
 //Interface exported by the server
 service PiCar {
@@ -22,7 +26,7 @@ message ConnectRequest {
 }
 
 //Sent from the PiCar once a ConnectRequest has been received
-message ConnectAck 
+message ConnectAck {
 	//Boolean, returns True for working connection, False if not accepted for some reason
 	bool success = 1;
 }

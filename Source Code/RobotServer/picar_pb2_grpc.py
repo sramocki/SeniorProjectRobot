@@ -15,17 +15,17 @@ class PiCarStub(object):
       channel: A grpc.Channel.
     """
     self.ReceiveConnection = channel.unary_unary(
-        '/PiCar/ReceiveConnection',
+        '/SeniorProjectRobot.PiCar/ReceiveConnection',
         request_serializer=picar__pb2.ConnectRequest.SerializeToString,
         response_deserializer=picar__pb2.ConnectAck.FromString,
         )
     self.SwitchMode = channel.unary_unary(
-        '/PiCar/SwitchMode',
+        '/SeniorProjectRobot.PiCar/SwitchMode',
         request_serializer=picar__pb2.ModeRequest.SerializeToString,
         response_deserializer=picar__pb2.ModeAck.FromString,
         )
     self.RemoteControl = channel.unary_unary(
-        '/PiCar/RemoteControl',
+        '/SeniorProjectRobot.PiCar/RemoteControl',
         request_serializer=picar__pb2.SetMotion.SerializeToString,
         response_deserializer=picar__pb2.Empty.FromString,
         )
@@ -76,5 +76,5 @@ def add_PiCarServicer_to_server(servicer, server):
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'PiCar', rpc_method_handlers)
+      'SeniorProjectRobot.PiCar', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))
