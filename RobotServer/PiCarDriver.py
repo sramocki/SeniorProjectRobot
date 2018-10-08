@@ -12,15 +12,19 @@ FW_ANGLE_MIN = 90-30
 bw = back_wheels.Back_Wheels()
 fw = front_wheels.Front_Wheels()
 
-fw.offset(0)
+fw.offset = 0
+fw.turn(90)
 bw.speed = 0
+
+motor_speed = 60
+
 
 
 def main():
     print "Begin drive!"
+    fw_angle = 0
     
     
-
 
 
 
