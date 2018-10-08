@@ -21,17 +21,20 @@
                 <MenuItem Header="_About" Click="About_Click" />
             </MenuItem>
         </Menu>
-        <Slider ValueChanged="Slider_ValueChanged" Thumb.DragStarted="Slider_DragStarted" Thumb.DragCompleted="Slider_DragCompleted" Orientation="Vertical" Minimum="0" Maximum="5" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="232,396,0,0" VerticalAlignment="Top" Width="31" Height="106" RenderTransformOrigin="-10.968,0.443"/>
         <RepeatButton Click="ButtonPress_Event" Content="Forward" HorizontalAlignment="Left" Margin="378,396,0,0" VerticalAlignment="Top" Width="75"/>
         <RepeatButton Click="ButtonPress_Event" Content="Backwards" HorizontalAlignment="Left" Margin="378,482,0,0" VerticalAlignment="Top" Width="75"/>
         <RepeatButton Click="ButtonPress_Event" Content="Left" HorizontalAlignment="Left" Margin="297,440,0,0" VerticalAlignment="Top" Width="75"/>
         <RepeatButton Click="ButtonPress_Event" Content="Right" HorizontalAlignment="Left" Margin="458,440,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="1.6,2.75"/>
-        <MediaElement Margin="297,59,259,466" OpacityMask="#FFFD1313"></MediaElement>
-        <Rectangle Fill="#FFD0D0EC" HorizontalAlignment="Left" Height="247" Margin="297,56,0,0" Stroke="Black" VerticalAlignment="Top" Width="236"/>
-        <ListBox Name="deviceListMn" HorizontalAlignment="Left" Height="398" Margin="10,104,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="deviceList_SelectionChanged"/>
-        <TextBox x:Name="ipBox" HorizontalAlignment="Left" Height="23" Margin="32,549,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-       
-        <TextBox x:Name="deviceStatus" HorizontalAlignment="Left" Height="23" Margin="655,446,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Leader" Click="SetLeader" HorizontalAlignment="Left" Margin="654,487,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.481,1.932"/>
+        <MediaElement Margin="297,116,259,409" OpacityMask="#FFFD1313"></MediaElement>
+        <Rectangle Fill="#FFD0D0EC" HorizontalAlignment="Left" Height="247" Margin="297,116,0,0" Stroke="Black" VerticalAlignment="Top" Width="236"/>
+        <ListBox Name="deviceListMn" HorizontalAlignment="Left" Height="291" Margin="27,72,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="deviceList_SelectionChanged"/>
+        <TextBox Name="ipBox" HorizontalAlignment="Left" Height="23" Margin="358,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" RenderTransformOrigin="0.908,-2.87"/>
+        <TextBox Name="deviceStatus" HorizontalAlignment="Left" Height="23" Margin="48,440,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127"/>
+        <Button Content="Leader" Click="SetLeader" HorizontalAlignment="Left" Margin="27,542,0,0" VerticalAlignment="Top" Width="64" RenderTransformOrigin="0.481,1.932"/>
+        <Button Content="Follower" Click="SetFollower" HorizontalAlignment="Left" Margin="125,542,0,0" VerticalAlignment="Top" Width="64" RenderTransformOrigin="0.481,1.932"/>
+        <Button Content="Idle" Click="SetDefault" HorizontalAlignment="Left" Margin="75,487,0,0" VerticalAlignment="Top" Width="64" RenderTransformOrigin="0.481,1.932"/>
+        <Label Content="Registered Device List" HorizontalAlignment="Left" Margin="27,41,0,0" VerticalAlignment="Top"/>
+        <Label Content="Selected IP " HorizontalAlignment="Left" Margin="395,36,0,0" VerticalAlignment="Top"/>
+        <Label Content="Status" HorizontalAlignment="Left" Margin="88,393,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

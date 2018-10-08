@@ -26,7 +26,6 @@ namespace RobotClient
         Stopwatch _stopWatch = new Stopwatch();
         TimeSpan _ts;
 
-
         public Registration()
         {
             InitializeComponent();
@@ -43,8 +42,8 @@ namespace RobotClient
                     _defaultGateway = gatewayOutput.Address.ToString();
                 }
             }
-            _defaultGateway = _defaultGateway.Substring(0, (_defaultGateway.Length - 1));
-            Console.WriteLine("The gateway IP is " + _defaultGateway);
+            _defaultGateway = _defaultGateway.Substring(0, _defaultGateway.Length - 1);
+            _mainWindow.LogField.AppendText("The gateway IP is " + _defaultGateway + "\n");
         }
 
         private void ButtonScan(object sender, RoutedEventArgs e)

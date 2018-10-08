@@ -15,3 +15,9 @@ C:\Users\seanr\source\repos\RobotClient\RobotClient\obj\Debug\RobotClient.exe
 C:\Users\seanr\source\repos\RobotClient\RobotClient\obj\Debug\RobotClient.pdb
 C:\Users\seanr\source\repos\RobotClient\RobotClient\obj\Debug\Registration.g.cs
 C:\Users\seanr\source\repos\RobotClient\RobotClient\obj\Debug\Registration.baml
+C:\Users\seanr\source\repos\RobotClient\RobotClient\bin\Debug\SharpDX.dll
+C:\Users\seanr\source\repos\RobotClient\RobotClient\bin\Debug\SharpDX.XInput.dll
+C:\Users\seanr\source\repos\RobotClient\RobotClient\bin\Debug\SharpDX.pdb
+C:\Users\seanr\source\repos\RobotClient\RobotClient\bin\Debug\SharpDX.XInput.pdb
+C:\Users\seanr\source\repos\RobotClient\RobotClient\bin\Debug\SharpDX.XInput.xml
+C:\Users\seanr\source\repos\RobotClient\RobotClient\obj\Debug\RobotClient.csproj.CopyComplete
