@@ -213,34 +213,48 @@ namespace RobotClient
 
         private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //Get the picar from the device List
             PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             Console.WriteLine("Selected " + picar);
 
+            //Update ipBox and deviceStatus with it's info
             ipBox.Text = picar.ipAddress;
             deviceStatus.Text = picar.mode.ToString();
         }
 
         private void SetLeader(object sender, RoutedEventArgs e)
         {
+            //Get the picar from the device List
             PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             Console.WriteLine("Setting " + picar + "as Leader");
+
+            //Send message to picar to change modes
             picar.setMode(ModeRequest.Types.Mode.Lead);
+            //Update deviceStatus
             deviceStatus.Text = picar.mode.ToString();
         }
 
         private void SetFollower(object sender, RoutedEventArgs e)
         {
+            //Get the picar from the device List
             PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             Console.WriteLine("Setting " + picar + "as Follower");
-            picar.setMode(ModeRequest.Types.Mode.Lead);
+
+            //Send message to picar to change modes
+            picar.setMode(ModeRequest.Types.Mode.Follow);
+            //Update deviceStatus
             deviceStatus.Text = picar.mode.ToString();
         }
 
         private void SetDefault(object sender, RoutedEventArgs e)
         {
+            //Get the picar from the device List
             PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             Console.WriteLine("Setting " + picar + "as Idle");
-            picar.setMode(ModeRequest.Types.Mode.Lead);
+
+            //Send message to picar to change modes
+            picar.setMode(ModeRequest.Types.Mode.Idle);
+            //Update deviceStatus
             deviceStatus.Text = picar.mode.ToString();
         }
 
