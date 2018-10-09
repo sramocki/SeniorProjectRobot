@@ -18,8 +18,9 @@ namespace RobotClient
 
     public partial class MainWindow : Window
     {
-        
-        public List<String[]> deviceListMain = new List<string[]>();
+
+        //public List<String[]> deviceListMain = new List<string[]>();
+        public List<PiCarConnection> deviceListMain = new List<PiCarConnection>();
         public string LeaderIp { set; get; }
         public string FollowerIP { set; get; }
         private bool _keyHoldW;
@@ -41,7 +42,7 @@ namespace RobotClient
 
             var newKeybind = new RoutedCommand();
             newKeybind.InputGestures.Add(new KeyGesture(Key.R, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(newKeybind, Register_Click));;
+            CommandBindings.Add(new CommandBinding(newKeybind, Register_Click)); ;
 
             _controller = new Controller(UserIndex.One);
             if (_controller.IsConnected)
@@ -74,25 +75,30 @@ namespace RobotClient
         private void Key_up(object sender, KeyEventArgs e)
         {
             _keyHoldGeneric = false;
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (e.Key == Key.W)
             {
                 _keyHoldW = false;
                 LogField.AppendText(DateTime.Now + ":\tStopped moving forward!\n");
+                picar.setMotion(0.0, 0.0);
             }
             if (e.Key == Key.S)
             {
                 _keyHoldS = false;
                 LogField.AppendText(DateTime.Now + ":\tStopped moving backwards!\n");
+                picar.setMotion(0.0, 0.0);
             }
             if (e.Key == Key.D)
             {
                 _keyHoldD = false;
                 LogField.AppendText(DateTime.Now + ":\tStopped moving right!\n");
+                picar.setMotion(0.0, 0.0);
             }
             if (e.Key == Key.A)
             {
                 _keyHoldA = false;
                 LogField.AppendText(DateTime.Now + ":\tStopped moving left\n");
+                picar.setMotion(0.0, 0.0);
             }
             LogField.ScrollToEnd();
         }
@@ -120,71 +126,75 @@ namespace RobotClient
                     break;
             }
 
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
 
-            /**
-             * Add code here for movement packets
-             *
-             */
             if (_keyHoldW && _keyHoldD)
             {
                 LogField.AppendText(DateTime.Now + ":\tMoving forward and right\n");
-                //Send packet L_1.0_1.0
+                if (picar != null)
+                    picar.setMotion(1.0, 1.0);
             }
             else if (_keyHoldW && _keyHoldA)
             {
                 LogField.AppendText(DateTime.Now + ":\tMoving forward and left\n");
-                //Send packet L_-1.0_1.0
+                if (picar != null)
+                    picar.setMotion(1.0, -1.0);
             }
             else if (_keyHoldW)
             {
                 LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
-                //Send packet L_0.0_1.0
+                if (picar != null)
+                    picar.setMotion(1.0, 0.0);
             }
             else if (_keyHoldS && _keyHoldA)
             {
                 LogField.AppendText(DateTime.Now + ":\tMoving backwards and left\n");
-                //Send packet L_-1.0_-1.0
+                if (picar != null)
+                    picar.setMotion(-1.0, 1.0);
             }
             else if (_keyHoldS && _keyHoldD)
             {
                 LogField.AppendText(DateTime.Now + ":\tMoving backwards and right\n");
-                //Send packet L_1.0_-1.0
+                if (picar != null)
+                    picar.setMotion(-1.0, -1.0);
             }
             else if (_keyHoldS)
             {
                 LogField.AppendText(DateTime.Now + ":\tMoving backwards\n");
-                //Send packet L_0.0_-1.0
+                if (picar != null)
+                    picar.setMotion(-1.0, 0.0);
             }
             LogField.ScrollToEnd();
         }
 
-        /**
-        * Add code here for movement packets
-        *
-        */
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
             var button = (RepeatButton)sender;
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             switch (button.Content)
             {
                 case "Forward":
                     LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
-                    //Send packet L_0.0_1.0
+                    if(picar != null)
+                        picar.setMotion(1.0, 0.0);
                     break;
 
                 case "Backwards":
                     LogField.AppendText(DateTime.Now + ":\tMoving backwards\n");
-                    //Send packet L_0.0_-1.0
+                    if (picar != null)
+                        picar.setMotion(-1.0, 0.0);
                     break;
 
                 case "Left":
                     LogField.AppendText(DateTime.Now + ":\tMoving left\n");
-                    //Send packet L_-1.0_0.0
+                    if (picar != null)
+                        picar.setMotion(0.0, -1.0);
                     break;
 
                 case "Right":
                     LogField.AppendText(DateTime.Now + ":\tMoving right\n");
-                    //Send packet L_1.0_0.0
+                    if (picar != null)
+                        picar.setMotion(0.0, 1.0);
                     break;
 
                 default:
@@ -207,45 +217,67 @@ namespace RobotClient
             if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
                     MessageBoxImage.Question) ==
                 MessageBoxResult.Yes)
+
                 Application.Current.Shutdown();
         }
 
         private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //Get the picar from the device List
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            if (picar != null)
+            {
+                Console.WriteLine("Selected " + picar);
 
-
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            Console.WriteLine(deviceString);
-
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            ipBox.Text = deviceListMain[index][1];
-            deviceStatus.Text = deviceListMain[index][2];
-            Console.WriteLine(index);
-
+                //Update ipBox and deviceStatus with it's info
+                ipBox.Text = picar.ipAddress;
+                deviceStatus.Text = picar.mode.ToString();
+            }
         }
 
         private void SetLeader(object sender, RoutedEventArgs e)
         {
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            deviceListMain[index][2] = "Leader";
-            deviceStatus.Text = deviceListMain[index][2];
+            //Get the picar from the device List
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            if (picar != null)
+            {
+                Console.WriteLine("Setting " + picar + "as Leader");
+
+                //Send message to picar to change modes
+                picar.setMode(ModeRequest.Types.Mode.Lead);
+                //Update deviceStatus
+                deviceStatus.Text = picar.mode.ToString();
+            }
         }
 
         private void SetFollower(object sender, RoutedEventArgs e)
         {
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            deviceListMain[index][2] = "Follower";
-            deviceStatus.Text = deviceListMain[index][2];
+            //Get the picar from the device List
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            if (picar != null)
+            {
+                Console.WriteLine("Setting " + picar + "as Follower");
+
+                //Send message to picar to change modes
+                picar.setMode(ModeRequest.Types.Mode.Follow);
+                //Update deviceStatus
+                deviceStatus.Text = picar.mode.ToString();
+            }
         }
 
         private void SetDefault(object sender, RoutedEventArgs e)
         {
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            deviceListMain[index][2] = "Default";
-            deviceStatus.Text = deviceListMain[index][2];
+            //Get the picar from the device List
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            if (picar != null)
+            {
+                Console.WriteLine("Setting " + picar + "as Idle");
+
+                //Send message to picar to change modes
+                picar.setMode(ModeRequest.Types.Mode.Idle);
+                //Update deviceStatus
+                deviceStatus.Text = picar.mode.ToString();
+            }
         }
 
         #region Properties

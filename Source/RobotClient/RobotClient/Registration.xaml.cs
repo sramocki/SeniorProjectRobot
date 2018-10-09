@@ -48,7 +48,7 @@ namespace RobotClient
 
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
-            ScanDevicesAsync();  
+            ScanDevicesAsync();
         }
 
         public async void ScanDevicesAsync()
@@ -120,19 +120,17 @@ namespace RobotClient
 
             //This is the currently selected IP to check
             string selectedIP = deviceStringList[index][1];
+            string selectedName = deviceStringList[index][0];
 
-            /**
-             * Add logic for GRPC here.
-             *
-             * Need to confirm the client can connect to the pi server for the selected IP.
-             * If it can connect, then the if statement runs and the pi server gets added to the main view for controlling.
-             */
-            bool CanConnect = true;
+            PiCarConnection newConnection = new PiCarConnection(selectedName, selectedIP);
+
+            bool CanConnect = newConnection.requestConnect();
             if (CanConnect)
             {
+                Console.WriteLine("Connected to " + selectedName + " with IP: " + selectedIP);
                 //Adds the device to the main view since it can connect
-                _mainWindow.deviceListMain.Add(new[] { deviceStringList[index][0], deviceStringList[index][1], deviceStringList[index][2] });
-                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain.Select(array => array.FirstOrDefault());
+                _mainWindow.deviceListMain.Add(newConnection);
+                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
             }
         }
     }
