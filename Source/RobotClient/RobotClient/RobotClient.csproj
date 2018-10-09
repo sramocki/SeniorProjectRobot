@@ -71,6 +71,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="PiCarConnection.cs" />
     <Compile Include="Picar.cs" />
     <Compile Include="PiCarConnection.cs" />
     <Compile Include="PicarGrpc.cs" />
