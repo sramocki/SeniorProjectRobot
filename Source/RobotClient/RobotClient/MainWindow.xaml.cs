@@ -47,11 +47,11 @@ namespace RobotClient
             _controller = new Controller(UserIndex.One);
             if (_controller.IsConnected)
             {
-                LogField.AppendText(DateTime.Now + ":\tController detected");
+                LogField.AppendText(DateTime.Now + ":\tController detected\n");
             }
             else
             {
-                LogField.AppendText(DateTime.Now + ":\tNo controller found");
+                LogField.AppendText(DateTime.Now + ":\tNo controller found\n");
             }
 
         }
