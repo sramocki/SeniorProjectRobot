@@ -24,7 +24,7 @@ fw_angle = 90 #straight
 def main():
     print "Begin drive!"
     move(0.6,0.0)
-    stime.sleep(3)
+    time.sleep(3)
     ## wait for input
     #python 2
     #raw_input("Press enter to stop the car")
