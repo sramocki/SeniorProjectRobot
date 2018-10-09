@@ -18,8 +18,9 @@ namespace RobotClient
 
     public partial class MainWindow : Window
     {
-        
-        public List<String[]> deviceListMain = new List<string[]>();
+
+        //public List<String[]> deviceListMain = new List<string[]>();
+        public List<PiCarConnection> deviceListMain = new List<PiCarConnection>();
         public string LeaderIp { set; get; }
         public string FollowerIP { set; get; }
         private bool _keyHoldW;
@@ -212,40 +213,35 @@ namespace RobotClient
 
         private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            Console.WriteLine("Selected " + picar);
 
-
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            Console.WriteLine(deviceString);
-
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            ipBox.Text = deviceListMain[index][1];
-            deviceStatus.Text = deviceListMain[index][2];
-            Console.WriteLine(index);
-
+            ipBox.Text = picar.ipAddress;
+            deviceStatus.Text = picar.mode.ToString();
         }
 
         private void SetLeader(object sender, RoutedEventArgs e)
         {
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            deviceListMain[index][2] = "Leader";
-            deviceStatus.Text = deviceListMain[index][2];
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            Console.WriteLine("Setting " + picar + "as Leader");
+            picar.setMode(ModeRequest.Types.Mode.Lead);
+            deviceStatus.Text = picar.mode.ToString();
         }
 
         private void SetFollower(object sender, RoutedEventArgs e)
         {
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            deviceListMain[index][2] = "Follower";
-            deviceStatus.Text = deviceListMain[index][2];
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            Console.WriteLine("Setting " + picar + "as Follower");
+            picar.setMode(ModeRequest.Types.Mode.Lead);
+            deviceStatus.Text = picar.mode.ToString();
         }
 
         private void SetDefault(object sender, RoutedEventArgs e)
         {
-            string deviceString = deviceListMn.SelectedItem.ToString();
-            int index = deviceListMain.FindIndex(array => array[0] == deviceString);
-            deviceListMain[index][2] = "Default";
-            deviceStatus.Text = deviceListMain[index][2];
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
+            Console.WriteLine("Setting " + picar + "as Idle");
+            picar.setMode(ModeRequest.Types.Mode.Lead);
+            deviceStatus.Text = picar.mode.ToString();
         }
 
         #region Properties

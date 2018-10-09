@@ -7,7 +7,7 @@ using Grpc.Core;
 
 namespace RobotClient
 {
-    class PiCarConnection
+    public class PiCarConnection
     {
         private class PiCarClient
         {
@@ -73,11 +73,13 @@ namespace RobotClient
         private Channel channel;
         private PiCarClient client;
         public string name;
+        public string ipAddress;
         public ModeRequest.Types.Mode mode;
 
         public PiCarConnection(string name, string ipAddress)
         {
             this.name = name;
+            this.ipAddress = ipAddress;
             channel = new Channel(ipAddress + ":50051", ChannelCredentials.Insecure);
             client = new PiCarClient(new PiCar.PiCarClient(channel));
             mode = ModeRequest.Types.Mode.Idle; //Start in Idle mode
