@@ -1,0 +1,18 @@
+﻿<Window x:Class="RobotClient.Registration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RobotClient"
+        mc:Ignorable="d"
+        Title="Register Vehicles" Height="450" Width="300
+        ">
+    <Grid Margin="0,0,0,0">
+        <Button Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="98,26,0,0" VerticalAlignment="Top" Width="100" Height="29"/>
+        <ListBox Name="deviceList" HorizontalAlignment="Left" Height="172" Margin="57,122,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="deviceList_SelectionChanged"/>
+        <Label Name="ipLabel" Content="Device List" HorizontalAlignment="Left" Margin="114,91,0,0" VerticalAlignment="Top"/>
+        <Button Content="Connect" Click="TryConnect" HorizontalAlignment="Left" Margin="98,365,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.481,1.932"/>
+        <TextBox Name="SelectedIP_Box" HorizontalAlignment="Left" Height="23" Margin="78,315,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.121,0.121"/>
+
+    </Grid>
+</Window>
