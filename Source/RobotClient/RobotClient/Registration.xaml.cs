@@ -12,9 +12,9 @@ using System.Windows.Controls;
 
 namespace RobotClient
 {
-    public partial class Registration : Window
+    public partial class Registration
     {
-        List<String[]> deviceStringList = new List<string[]>();
+        List<string[]> deviceStringList = new List<string[]>();
         private readonly MainWindow _mainWindow = (MainWindow)Application.Current.MainWindow;
 
         private string _defaultGateway;
@@ -61,7 +61,7 @@ namespace RobotClient
 
             _stopWatch.Start();
 
-            for (int i = 1; i <= 255; i++)
+            for (var i = 1; i <= 255; i++)
             {
                 _scanningIp = _defaultGateway + i;
 
@@ -103,14 +103,13 @@ namespace RobotClient
             }
         }
 
-        private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
             var deviceString = deviceList.SelectedItem.ToString();
             Console.WriteLine(deviceString);
-
             var index = deviceStringList.FindIndex(array => array[0] == deviceString);
-            SelectedIP_Box.Text = deviceStringList[index][1].ToString();
+            SelectedIP_Box.Text = deviceStringList[index][1];
             Console.WriteLine(index);
 
         }
@@ -118,8 +117,8 @@ namespace RobotClient
         private void TryConnect(object sender, RoutedEventArgs e)
         {
 
-            string selectedDevice = deviceList.SelectedItem.ToString();
-            int index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
+            var selectedDevice = deviceList.SelectedItem.ToString();
+            var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
 
             //This is the currently selected IP to check
             var selectedIP = deviceStringList[index][1];
@@ -127,10 +126,9 @@ namespace RobotClient
 
             var newConnection = new PiCarConnection(selectedName, selectedIP);
 
-            var CanConnect = newConnection.requestConnect();
-            if (!CanConnect) return;
-            Console.WriteLine("Connected to " + selectedName + " with IP: " + selectedIP);
-            //Adds the device to the main view since it can connect
+            var canConnect = newConnection.requestConnect();
+            if (!canConnect) return;
+            _mainWindow.LogField.AppendText("Connected to " + selectedName + " with IP: " + selectedIP + "\n");
             _mainWindow.deviceListMain.Add(newConnection);
             _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
         }

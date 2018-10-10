@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -15,7 +12,7 @@ using SharpDX.XInput;
 namespace RobotClient
 {
 
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
 
         //public List<String[]> deviceListMain = new List<string[]>();
@@ -264,7 +261,7 @@ namespace RobotClient
                 Application.Current.Shutdown();
         }
 
-        private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //Get the picar from the device List
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
