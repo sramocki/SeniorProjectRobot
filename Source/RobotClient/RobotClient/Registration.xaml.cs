@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -87,11 +88,11 @@ namespace RobotClient
                 {
                     deviceName = Dns.GetHostEntry(ip).HostName;
                 }
-                catch (Exception e)
+                catch (SocketException e)
                 {
-                    deviceName = "unknown" + ip;
+                    deviceName = "Unknown Device at " + ip;
                 }
-                Console.WriteLine("Device Name is: " + deviceName);
+                Console.WriteLine(deviceName + " at " + ip + "\n");
                 deviceStringList.Add(new[] { deviceName, ip, "Default" });
                 deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
                 lock (_lockObj)
