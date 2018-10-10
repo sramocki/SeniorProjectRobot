@@ -191,7 +191,7 @@ namespace RobotClient
             }
             else if (_keyHoldW)
             {
-                LogField.AppendText(DateTime.Now + ":\tMoving forward\n");)
+                LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
                 picar.setMotion(0.0, 1.0);
             }
             else if (_keyHoldS && _keyHoldA)
