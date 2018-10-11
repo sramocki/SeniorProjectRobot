@@ -32,6 +32,7 @@ namespace RobotClient
         {
             InitializeComponent();
             deviceList.ItemsSource = null;
+            deviceStringList.Add(new[] { "Dummy", "Testing", "Default" });
 
             //Finds default gateway IP
             deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
@@ -125,6 +126,17 @@ namespace RobotClient
             var selectedIP = deviceStringList[index][1];
             var selectedName = deviceStringList[index][0];
 
+            //Handle the dummy connection
+            if (selectedIP == "Testing" & selectedName == "Dummy")
+            {
+                _mainWindow.LogField.AppendText("Added dummy device for testing\n");
+                var dummyConnection = new DummyConnection("Dummy", "Testing");
+                _mainWindow.deviceListMain.Add(dummyConnection);
+                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
+                return;
+            }
+
+            //Handle a regular connection
             var canConnect = false;
             PiCarConnection newConnection = null;
 
