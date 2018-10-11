@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Grpc.Core;
 
 
 namespace RobotClient
@@ -31,6 +32,7 @@ namespace RobotClient
         {
             InitializeComponent();
             deviceList.ItemsSource = null;
+            deviceStringList.Add(new[] { "Dummy", "Testing", "Default" });
 
             //Finds default gateway IP
             deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
@@ -124,13 +126,37 @@ namespace RobotClient
             var selectedIP = deviceStringList[index][1];
             var selectedName = deviceStringList[index][0];
 
-            var newConnection = new PiCarConnection(selectedName, selectedIP);
+            //Handle the dummy connection
+            if (selectedIP == "Testing" & selectedName == "Dummy")
+            {
+                _mainWindow.LogField.AppendText("Added dummy device for testing\n");
+                var dummyConnection = new DummyConnection("Dummy", "Testing");
+                _mainWindow.deviceListMain.Add(dummyConnection);
+                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
+                return;
+            }
 
-            var canConnect = newConnection.requestConnect();
-            if (!canConnect) return;
-            _mainWindow.LogField.AppendText("Connected to " + selectedName + " with IP: " + selectedIP + "\n");
-            _mainWindow.deviceListMain.Add(newConnection);
-            _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
+            //Handle a regular connection
+            var canConnect = false;
+            PiCarConnection newConnection = null;
+
+            try
+            {
+                newConnection = new PiCarConnection(selectedName, selectedIP);
+                canConnect = newConnection.requestConnect();
+            }
+            catch (RpcException rpcE) { }
+
+            if (canConnect)
+            {
+                _mainWindow.LogField.AppendText("Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+                _mainWindow.deviceListMain.Add(newConnection);
+                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
+            }
+            else
+            {
+                _mainWindow.LogField.AppendText("Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+            }
         }
     }
 }

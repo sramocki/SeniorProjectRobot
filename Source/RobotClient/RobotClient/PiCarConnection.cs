@@ -76,6 +76,13 @@ namespace RobotClient
         public string ipAddress;
         public ModeRequest.Types.Mode mode;
 
+        public PiCarConnection()
+        {
+            name = "Default";
+            ipAddress = "127.0.0.1";
+            mode = ModeRequest.Types.Mode.Idle;
+        }
+
         public PiCarConnection(string name, string ipAddress)
         {
             this.name = name;
@@ -85,12 +92,12 @@ namespace RobotClient
             mode = ModeRequest.Types.Mode.Idle; //Start in Idle mode
         }
 
-        public bool requestConnect()
+        public virtual bool requestConnect()
         {
             return client.requestConnect();
         }
 
-        public void setMode(ModeRequest.Types.Mode mode)
+        public virtual void setMode(ModeRequest.Types.Mode mode)
         {
             bool success = client.setMode(mode);
             //Change local mode if successful
@@ -98,7 +105,7 @@ namespace RobotClient
                 this.mode = mode;
         }
 
-        public void setMotion(double throttle, double direction)
+        public virtual void setMotion(double throttle, double direction)
         {
             client.setMotion(throttle, direction);
         }
@@ -111,6 +118,31 @@ namespace RobotClient
         public async Task Shutdown()
         {
             await channel.ShutdownAsync();
+        }
+    }
+
+    public class DummyConnection : PiCarConnection
+    { 
+        public DummyConnection(string name, string ipAddress)
+        {
+            this.name = name;
+            this.ipAddress = ipAddress;
+            mode = ModeRequest.Types.Mode.Idle;
+        }
+
+        public override bool requestConnect()
+        {
+            return true;
+        }
+
+        public override void setMode(ModeRequest.Types.Mode mode)
+        {
+            this.mode = mode;
+        }
+
+        public override void setMotion(double throttle, double direction)
+        {
+            //Do Nothing
         }
     }
 }
