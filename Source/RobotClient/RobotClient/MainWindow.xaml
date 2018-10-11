@@ -27,7 +27,7 @@
         <RepeatButton Click="ButtonPress_Event" Content="Right" HorizontalAlignment="Left" Margin="458,440,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="1.6,2.75"/>
         <MediaElement Margin="297,116,259,409" OpacityMask="#FFFD1313"></MediaElement>
         <Rectangle Fill="#FFD0D0EC" HorizontalAlignment="Left" Height="247" Margin="297,116,0,0" Stroke="Black" VerticalAlignment="Top" Width="236"/>
-        <ListBox Name="deviceListMn" HorizontalAlignment="Left" Height="291" Margin="27,72,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="deviceList_SelectionChanged"/>
+        <ListBox Name="deviceListMn" HorizontalAlignment="Left" Height="291" Margin="27,72,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged"/>
         <TextBox Name="ipBox" HorizontalAlignment="Left" Height="23" Margin="358,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" RenderTransformOrigin="0.908,-2.87"/>
         <TextBox Name="deviceStatus" HorizontalAlignment="Left" Height="23" Margin="48,440,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127"/>
         <Button Content="Leader" Click="SetLeader" HorizontalAlignment="Left" Margin="27,542,0,0" VerticalAlignment="Top" Width="64" RenderTransformOrigin="0.481,1.932"/>

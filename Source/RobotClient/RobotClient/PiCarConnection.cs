@@ -107,5 +107,10 @@ namespace RobotClient
         {
             return name;
         }
+
+        public async Task Shutdown()
+        {
+            await channel.ShutdownAsync();
+        }
     }
 }

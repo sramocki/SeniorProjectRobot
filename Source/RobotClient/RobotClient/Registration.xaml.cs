@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,9 +12,9 @@ using System.Windows.Controls;
 
 namespace RobotClient
 {
-    public partial class Registration : Window
+    public partial class Registration
     {
-        List<String[]> deviceStringList = new List<string[]>();
+        List<string[]> deviceStringList = new List<string[]>();
         private readonly MainWindow _mainWindow = (MainWindow)Application.Current.MainWindow;
 
         private string _defaultGateway;
@@ -33,10 +34,10 @@ namespace RobotClient
 
             //Finds default gateway IP
             deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
-            foreach (NetworkInterface curInterface in NetworkInterface.GetAllNetworkInterfaces())
+            foreach (var curInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (curInterface.OperationalStatus != OperationalStatus.Up) continue;
-                foreach (GatewayIPAddressInformation gatewayOutput in curInterface.GetIPProperties()
+                foreach (var gatewayOutput in curInterface.GetIPProperties()
                     .GatewayAddresses)
                 {
                     _defaultGateway = gatewayOutput.Address.ToString();
@@ -48,7 +49,8 @@ namespace RobotClient
 
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
-            ScanDevicesAsync();  
+            //Send cancellation token
+            ScanDevicesAsync();
         }
 
         public async void ScanDevicesAsync()
@@ -59,7 +61,7 @@ namespace RobotClient
 
             _stopWatch.Start();
 
-            for (int i = 1; i <= 255; i++)
+            for (var i = 1; i <= 255; i++)
             {
                 _scanningIp = _defaultGateway + i;
 
@@ -87,11 +89,11 @@ namespace RobotClient
                 {
                     deviceName = Dns.GetHostEntry(ip).HostName;
                 }
-                catch (Exception e)
+                catch (SocketException e)
                 {
-                    deviceName = "unknown" + ip;
+                    deviceName = "Unknown Device at " + ip;
                 }
-                Console.WriteLine("Device Name is: " + deviceName);
+                Console.WriteLine(deviceName + " at " + ip + "\n");
                 deviceStringList.Add(new[] { deviceName, ip, "Default" });
                 deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
                 lock (_lockObj)
@@ -101,41 +103,34 @@ namespace RobotClient
             }
         }
 
-        private void deviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            string deviceString = deviceList.SelectedItem.ToString();
+            var deviceString = deviceList.SelectedItem.ToString();
             Console.WriteLine(deviceString);
-
-            int index = deviceStringList.FindIndex(array => array[0] == deviceString);
-            SelectedIP_Box.Text = deviceStringList[index][1].ToString();
+            var index = deviceStringList.FindIndex(array => array[0] == deviceString);
+            SelectedIP_Box.Text = deviceStringList[index][1];
             Console.WriteLine(index);
 
         }
 
         private void TryConnect(object sender, RoutedEventArgs e)
         {
-            string selectedDevice = deviceList.SelectedItem.ToString();
-            int index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
+
+            var selectedDevice = deviceList.SelectedItem.ToString();
+            var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
 
             //This is the currently selected IP to check
-            string selectedIP = deviceStringList[index][1];
-            string selectedName = deviceStringList[index][0];
-            
-            //For now, test with localhost
-            //TODO: Remove later
-            selectedIP = "127.0.0.1";
+            var selectedIP = deviceStringList[index][1];
+            var selectedName = deviceStringList[index][0];
 
-            PiCarConnection newConnection = new PiCarConnection(selectedName, selectedIP);
+            var newConnection = new PiCarConnection(selectedName, selectedIP);
 
-            
-            bool CanConnect = newConnection.requestConnect();
-            if (CanConnect)
-            {
-                //Adds the device to the main view since it can connect
-                _mainWindow.deviceListMain.Add(newConnection);
-                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
-            }
+            var canConnect = newConnection.requestConnect();
+            if (!canConnect) return;
+            _mainWindow.LogField.AppendText("Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+            _mainWindow.deviceListMain.Add(newConnection);
+            _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
         }
     }
 }

@@ -9,10 +9,11 @@
         ">
     <Grid Margin="0,0,0,0">
         <Button Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="98,26,0,0" VerticalAlignment="Top" Width="100" Height="29"/>
-        <ListBox Name="deviceList" HorizontalAlignment="Left" Height="172" Margin="57,122,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="deviceList_SelectionChanged"/>
+        <ListBox Name="deviceList" HorizontalAlignment="Left" Height="172" Margin="57,122,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged"/>
         <Label Name="ipLabel" Content="Device List" HorizontalAlignment="Left" Margin="114,91,0,0" VerticalAlignment="Top"/>
-        <Button Content="Connect" Click="TryConnect" HorizontalAlignment="Left" Margin="98,365,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.481,1.932"/>
+        <Button Name ="Scan" Content="Connect" Click="TryConnect" HorizontalAlignment="Left" Margin="98,365,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.481,1.932"/>
         <TextBox Name="SelectedIP_Box" HorizontalAlignment="Left" Height="23" Margin="78,315,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.121,0.121"/>
+        <Button Name ="Cancel" Content="Cancel" Click="ButtonScan" HorizontalAlignment="Left" Margin="114,66,0,0" VerticalAlignment="Top" Width="74" Height="20"/>
 
     </Grid>
 </Window>
