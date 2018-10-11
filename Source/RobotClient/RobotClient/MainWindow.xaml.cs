@@ -291,6 +291,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             Console.WriteLine("Setting " + picar + "as Follower");
 
             //Send message to picar to change modes
@@ -304,6 +305,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
+            PiCarConnection picar = (PiCarConnection)deviceListMn.SelectedItem;
             Console.WriteLine("Setting " + picar + "as Idle");
 
             //Send message to picar to change modes
