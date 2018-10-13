@@ -28,11 +28,13 @@ namespace RobotClient
         Stopwatch _stopWatch = new Stopwatch();
         TimeSpan _ts;
 
+
+
         public Registration()
         {
             InitializeComponent();
             deviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy", "Testing", "Default" });
+            deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
 
             //Finds default gateway IP
             deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
@@ -53,6 +55,18 @@ namespace RobotClient
         {
             //Send cancellation token
             ScanDevicesAsync();
+        }
+
+
+        private void ButtonScanCancel(object sender, RoutedEventArgs e)
+        {
+
+           /* while (tasks.Any())
+            {
+                tasks[0].Dispose();
+                tasks.RemoveAt(0);
+            }
+            LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");*/
         }
 
         public async void ScanDevicesAsync()
@@ -128,10 +142,10 @@ namespace RobotClient
             var selectedName = deviceStringList[index][0];
 
             //Handle the dummy connection
-            if (selectedIP == "Testing" & selectedName == "Dummy")
+            if (selectedIP == "127.0.0.1" & selectedName == "Dummy")
             {
                 _mainWindow.LogField.AppendText("Added dummy device for testing\n");
-                var dummyConnection = new DummyConnection("Dummy", "Testing");
+                var dummyConnection = new DummyConnection("Dummy", "127.0.0.1");
                 _mainWindow.deviceListMain.Add(dummyConnection);
                 _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
                 return;

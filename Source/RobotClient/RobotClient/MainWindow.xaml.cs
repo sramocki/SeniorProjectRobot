@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using SharpDX.XInput;
+using System.IO;
 
 namespace RobotClient
 {
@@ -73,9 +74,12 @@ namespace RobotClient
             register.Show();
         }
 
-        private void ExportData_Click(object sender, RoutedEventArgs e)
+        private void ExportLog_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //TODO Make the Log Export to the Application Path and Work a Time Stamp into Log Export's file Name
+            string documentsLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string filename = "Log " + DateTime.Now.ToString("dddd, dd MMMM yyyy")+ ".txt";
+            File.WriteAllText(Path.Combine(documentsLocation, filename), LogField.Text);
         }
 
         private void ImportData_Click(object sender, RoutedEventArgs e)
@@ -249,7 +253,7 @@ namespace RobotClient
         private void About_Click(object sender, RoutedEventArgs e)
         {
             //TODO rewrite for tutorial information/team
-            MessageBox.Show("Created by various people", "About");
+            MessageBox.Show("Created by Team Robot Follower, of Capstone Project Class 4999 of Fall 2018 \nThe Team consists of:\nEric Ramocki and Sean Ramocki on Desktop Application Developer\nAlex Alwardt and Scott Dudley on Network/Desktop Application Developer \nChristian Nickolaou and Anton Cantoldo on Vehicle Application/Systems Developer", "About");
         }
 
         private void Shutdown_Click(object sender, RoutedEventArgs e)
