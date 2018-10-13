@@ -219,7 +219,7 @@ namespace RobotClient
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
             var button = (RepeatButton)sender;
-            switch (button.Content)
+            switch (button.Name)
             {
                 case "Forward":
                     LogField.AppendText(DateTime.Now + ":\tMoving forward\n");

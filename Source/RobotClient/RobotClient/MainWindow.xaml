@@ -24,10 +24,10 @@
                 <MenuItem Header="_About" Click="About_Click" />
             </MenuItem>
         </Menu>
-        <RepeatButton Click="ButtonPress_Event" Content="↑" HorizontalAlignment="Left" Margin="71,385,0,0" VerticalAlignment="Top" Width="44" Grid.Column="1" Height="39" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
-        <RepeatButton Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="71,463,0,0" VerticalAlignment="Top" Width="44" Grid.Column="1" Height="39" FontSize="24"/>
-        <RepeatButton Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="27,424,0,0" VerticalAlignment="Top" Width="44" Height="39" Grid.Column="1" FontSize="24"/>
-        <RepeatButton Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="115,424,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" Grid.Column="1" FontSize="24" Height="39"/>
+        <RepeatButton x:Name="Forward" Click="ButtonPress_Event" Content="↑" HorizontalAlignment="Left" Margin="71,385,0,0" VerticalAlignment="Top" Width="44" Grid.Column="1" Height="39" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
+        <RepeatButton x:Name="Backwards" Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="71,463,0,0" VerticalAlignment="Top" Width="44" Grid.Column="1" Height="39" FontSize="24"/>
+        <RepeatButton x:Name="Left" Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="27,424,0,0" VerticalAlignment="Top" Width="44" Height="39" Grid.Column="1" FontSize="24"/>
+        <RepeatButton x:Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="115,424,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" Grid.Column="1" FontSize="24" Height="39"/>
         <MediaElement Margin="297,116,259,409" OpacityMask="#FFFD1313" Grid.ColumnSpan="2"></MediaElement>
         <Rectangle Fill="#FFD0D0EC" Margin="298,117,259,409" Stroke="Black" Grid.ColumnSpan="2"/>
         <ListBox Name="deviceListMn"  HorizontalAlignment="Left" Height="291" Margin="27,72,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center"/>
