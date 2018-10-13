@@ -28,11 +28,13 @@ namespace RobotClient
         Stopwatch _stopWatch = new Stopwatch();
         TimeSpan _ts;
 
+
+
         public Registration()
         {
             InitializeComponent();
             deviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy", "Testing", "Default" });
+            deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
 
             //Finds default gateway IP
             deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
@@ -46,7 +48,7 @@ namespace RobotClient
                 }
             }
             _defaultGateway = _defaultGateway.Substring(0, _defaultGateway.Length - 1);
-            _mainWindow.LogField.AppendText("The gateway IP is " + _defaultGateway + "\n");
+            LogFieldReg.AppendText(DateTime.Now + ":\t The gateway IP is " + _defaultGateway + "\n");
         }
 
         private void ButtonScan(object sender, RoutedEventArgs e)
@@ -55,9 +57,22 @@ namespace RobotClient
             ScanDevicesAsync();
         }
 
+
+        private void ButtonScanCancel(object sender, RoutedEventArgs e)
+        {
+
+           /* while (tasks.Any())
+            {
+                tasks[0].Dispose();
+                tasks.RemoveAt(0);
+            }
+            LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");*/
+        }
+
         public async void ScanDevicesAsync()
         {
             _devicesFound = 0;
+            LogFieldReg.AppendText(DateTime.Now + ":\t"+"Starting Scan for Devices: \n");
 
             var tasks = new List<Task>();
 
@@ -95,7 +110,7 @@ namespace RobotClient
                 {
                     deviceName = "Unknown Device at " + ip;
                 }
-                Console.WriteLine(deviceName + " at " + ip + "\n");
+                LogFieldReg.AppendText(DateTime.Now + ":\t" + deviceName + " at " + ip + "\n");
                 deviceStringList.Add(new[] { deviceName, ip, "Default" });
                 deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
                 lock (_lockObj)
@@ -127,10 +142,10 @@ namespace RobotClient
             var selectedName = deviceStringList[index][0];
 
             //Handle the dummy connection
-            if (selectedIP == "Testing" & selectedName == "Dummy")
+            if (selectedIP == "127.0.0.1" & selectedName == "Dummy")
             {
                 _mainWindow.LogField.AppendText("Added dummy device for testing\n");
-                var dummyConnection = new DummyConnection("Dummy", "Testing");
+                var dummyConnection = new DummyConnection("Dummy", "127.0.0.1");
                 _mainWindow.deviceListMain.Add(dummyConnection);
                 _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
                 return;
@@ -149,13 +164,13 @@ namespace RobotClient
 
             if (canConnect)
             {
-                _mainWindow.LogField.AppendText("Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t"+"Connected to " + selectedName + " with IP: " + selectedIP + "\n");
                 _mainWindow.deviceListMain.Add(newConnection);
                 _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
             }
             else
             {
-                _mainWindow.LogField.AppendText("Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t"+"Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
             }
         }
     }
