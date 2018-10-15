@@ -31,6 +31,29 @@ def main():
     ap.add_argument("-m", "--mode", help="mode that the car will be in")
     args = vars(ap.parse_args())
 
+    # get a reference to the camera, default is 0
+    camera = cv2.VideoCapture(0)
+
+    # loop over frames
+    while True:
+
+        #grab the current frame from the camera
+        (grabbed, frame) = camera.read()
+
+        # if there is no frame to get from the camera, break
+        if not grabbed:
+            break
+
+        # display frames
+        cv2.imshow("frame", frame)
+
+        #record if the user presses a key
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == ord("q"):
+            break
+
+
     print "Begin drive!"
     move(0.6,0.0)
     time.sleep(3)
@@ -41,6 +64,9 @@ def main():
     #input("Press enter to stop the car")
     move(0.0,0.0)
     print "End Drive"
+
+    camera.release()
+    cv2.destroyAllWindows()
 
 
 def move(throttle, direction):
