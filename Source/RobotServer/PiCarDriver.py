@@ -2,6 +2,7 @@ from picar import front_wheels, back_wheels
 import picar
 import cv2 as cv
 import time
+import argparse
 
 picar.setup()
 rear_wheels_enabled = True
@@ -22,6 +23,11 @@ fw_angle = 90 #straight
 
 
 def main():
+    #parse the command line arguments
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-m", "--mode", help="mode that the car will be in")
+    args = vars(ap.parse_args())
+
     print "Begin drive!"
     move(0.6,0.0)
     time.sleep(3)
@@ -43,14 +49,16 @@ def move(throttle, direction):
         fw.turn(fw_angle)
     if rear_wheels_enabled:
         if (throttle > 0.0):
-            bw.foward()
-        else if (throttle < 0.0):
+            bw.forward()
+        elif (throttle < 0.0):
             bw.backward()
-        else
+        else:
             bw.stop()
 
 def destroy():
     bw.stop()
+
+
 
 
 if __name__ == '__main__':
