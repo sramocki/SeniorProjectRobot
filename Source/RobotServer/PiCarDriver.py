@@ -21,6 +21,9 @@ bw.speed = 0
 motor_speed = 60
 fw_angle = 90 #straight
 
+frame = None
+roiPts = []
+inputMode = False
 
 def main():
     #parse the command line arguments
@@ -58,7 +61,15 @@ def move(throttle, direction):
 def destroy():
     bw.stop()
 
+def selectROI (event, x, y, flags, param):
+    # get references to current frame, roiPts, and if in selection mode
+    global frame, roiPts, inputMode
 
+    # update the list of ROI points with the (x,y) location of the click
+    if inputMode and event == cv2.EVENT_LBUTTONDOWN and len(roiPts) < 4:
+        roiPts.append((x, y))
+        cv2.circle(frame, (x, y), 4, (0, 255, 0), 2)
+        cv2.imshow("frame", frame)
 
 
 if __name__ == '__main__':
