@@ -37,18 +37,12 @@ def main():
     server = PiCarServicer()
     picarserver.serve()
 
-
-    #parse the command line arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-m", "--mode", help="mode that the car will be in")
-    args = vars(ap.parse_args())
-
     # get a reference to the camera, default is 0
     camera = cv2.VideoCapture(0)
 
     # loop over frames
     while True:
-        
+
         # get reference to current mode
         global mode = server.mode
 
