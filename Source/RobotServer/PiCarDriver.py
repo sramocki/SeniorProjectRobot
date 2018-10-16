@@ -1,8 +1,11 @@
 from picar import front_wheels, back_wheels
 import picar
 import cv2 as cv
+from concurrent import futures
 import time
 import argparse
+import picarserver
+
 
 picar.setup()
 rear_wheels_enabled = True
@@ -25,7 +28,16 @@ frame = None
 roiPts = []
 inputMode = False
 
+mode = 'IDLE'
+throttle = 0
+direction = 0
+
 def main():
+
+    server = PiCarServicer()
+    picarserver.serve()
+
+
     #parse the command line arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-m", "--mode", help="mode that the car will be in")
@@ -36,6 +48,13 @@ def main():
 
     # loop over frames
     while True:
+
+        if mode == 'LEADER':
+            # leader mode
+        elif mode == 'FOLLOWER':
+            # follower mode
+        else:
+            # idle mode
 
         #grab the current frame from the camera
         (grabbed, frame) = camera.read()
@@ -86,17 +105,6 @@ def move(throttle, direction):
 
 def destroy():
     bw.stop()
-
-def selectROI (event, x, y, flags, param):
-    # get references to current frame, roiPts, and if in selection mode
-    global frame, roiPts, inputMode
-
-    # update the list of ROI points with the (x,y) location of the click
-    if inputMode and event == cv2.EVENT_LBUTTONDOWN and len(roiPts) < 4:
-        roiPts.append((x, y))
-        cv2.circle(frame, (x, y), 4, (0, 255, 0), 2)
-        cv2.imshow("frame", frame)
-
 
 if __name__ == '__main__':
     try:
