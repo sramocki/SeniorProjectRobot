@@ -48,29 +48,34 @@ def main():
 
     # loop over frames
     while True:
+        
+        # get reference to current mode
+        global mode = server.mode
 
         if mode == 'LEADER':
             # leader mode
+
         elif mode == 'FOLLOWER':
             # follower mode
+            #grab the current frame from the camera
+            (grabbed, frame) = camera.read()
+
+            # if there is no frame to get from the camera, break
+            if not grabbed:
+                break
+
+            # display frames
+            cv2.imshow("frame", frame)
+
+            #record if the user presses a key
+            key = cv2.waitKey(1) & 0xFF
+
+            if key == ord("q"):
+                break
         else:
             # idle mode
 
-        #grab the current frame from the camera
-        (grabbed, frame) = camera.read()
-
-        # if there is no frame to get from the camera, break
-        if not grabbed:
-            break
-
-        # display frames
-        cv2.imshow("frame", frame)
-
-        #record if the user presses a key
-        key = cv2.waitKey(1) & 0xFF
-
-        if key == ord("q"):
-            break
+        
 
 
     print "Begin drive!"
