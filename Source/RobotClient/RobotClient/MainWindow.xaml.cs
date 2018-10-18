@@ -175,6 +175,9 @@ namespace RobotClient
 
         private void Key_down(object sender, KeyEventArgs e)
         {
+            if (e.IsRepeat)
+                return;
+
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
             _keyHoldGeneric = true;
