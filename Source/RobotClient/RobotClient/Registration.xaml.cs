@@ -35,6 +35,7 @@ namespace RobotClient
             InitializeComponent();
             deviceList.ItemsSource = null;
             deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
+            deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
 
             //Finds default gateway IP
             deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
