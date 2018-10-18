@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using SharpDX.XInput;
+using System.IO;
 
 namespace RobotClient
 {
@@ -33,6 +34,10 @@ namespace RobotClient
         private int deadband = 2500;
         private double _Motor1;
         private double _Motor2;
+
+
+
+        
 
 
         public MainWindow()
@@ -73,9 +78,12 @@ namespace RobotClient
             register.Show();
         }
 
-        private void ExportData_Click(object sender, RoutedEventArgs e)
+        private void ExportLog_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //TODO Make the Log Export to the Application Path and Work a Time Stamp into Log Export's file Name
+            string documentsLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string filename = "Log " + DateTime.Now.ToString("dddd, dd MMMM yyyy")+ ".txt";
+            File.WriteAllText(Path.Combine(documentsLocation, filename), LogField.Text);
         }
 
         private void ImportData_Click(object sender, RoutedEventArgs e)
@@ -85,34 +93,48 @@ namespace RobotClient
 
         private void Key_up(object sender, KeyEventArgs e)
         {
+
+
+
             _keyHoldGeneric = false;
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
-            if (e.Key == Key.W)
+
+
+            double motorOne = 0.0;
+            double motorTwo = 0.0;
+
+
+            String[] motorTwoDir = { "Now Moving backwards", "Now In Neutral", "Now Moving forwards" };
+            String[] motorOneDir = { "and left", "", "and right" };
+
+
+            if ((Keyboard.IsKeyUp(Key.W)) && (Keyboard.IsKeyUp(Key.Up)))
             {
-                _keyHoldW = false;
-                LogField.AppendText(DateTime.Now + ":\tStopped moving forward!\n");
-                picar.setMotion(0.0, 1.0);
+                motorTwo--;
+                
             }
-            if (e.Key == Key.S)
+
+            if ((Keyboard.IsKeyUp(Key.S)) && (Keyboard.IsKeyUp(Key.Down)))
             {
-                _keyHoldS = false;
-                LogField.AppendText(DateTime.Now + ":\tStopped moving backwards!\n");
-                picar.setMotion(0.0, -1.0);
+                motorTwo++;
+                
             }
-            if (e.Key == Key.D)
+
+            if ((Keyboard.IsKeyUp(Key.A)) && (Keyboard.IsKeyUp(Key.Left)))
             {
-                _keyHoldD = false;
-                LogField.AppendText(DateTime.Now + ":\tStopped moving right!\n");
-                picar.setMotion(1.0, 0.0);
+                motorOne++;
+                
             }
-            if (e.Key == Key.A)
+            if ((Keyboard.IsKeyUp(Key.D)) && (Keyboard.IsKeyUp(Key.Right)))
             {
-                _keyHoldA = false;
-                LogField.AppendText(DateTime.Now + ":\tStopped moving left\n");
-                picar.setMotion(-1.0, 0.0);
+                motorOne--;
             }
+
+            LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " + motorOneDir[(int)motorOne + 1] + "\n");
+            picar.setMotion(motorOne, motorTwo);
             LogField.ScrollToEnd();
+
         }
 
         private void ControllerMovement()
@@ -156,57 +178,37 @@ namespace RobotClient
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
             _keyHoldGeneric = true;
-            switch (e.Key)
+
+            double motorOne = 0.0;
+            double motorTwo = 0.0;
+
+            String[] motorTwoDir = { "Moving backwards", "In Neutral", "Moving forwards" };
+            String[] motorOneDir = { "and left", "", "and right" };
+
+
+            if ((Keyboard.IsKeyDown(Key.W)) || (Keyboard.IsKeyDown(Key.Up)))
             {
-                case Key.W:
-                case Key.Up:
-                    _keyHoldW = true;
-                    break;
-                case Key.A:
-                case Key.Left:
-                    _keyHoldA = true;
-                    break;
-                case Key.D:
-                case Key.Right:
-                    _keyHoldD = true;
-                    break;
-                case Key.S:
-                case Key.Down:
-                    _keyHoldS = true;
-                    break;
+                motorTwo++;
             }
 
-            if (_keyHoldW && _keyHoldD)
+            if ((Keyboard.IsKeyDown(Key.S)) || (Keyboard.IsKeyDown(Key.Down)))
             {
-                LogField.AppendText(DateTime.Now + ":\tMoving forward and right\n");
-                picar.setMotion(1.0, 1.0);
+                motorTwo--;
             }
-            else if (_keyHoldW && _keyHoldA)
+
+            if ((Keyboard.IsKeyDown(Key.A)) || (Keyboard.IsKeyDown(Key.Left)))
             {
-                LogField.AppendText(DateTime.Now + ":\tMoving forward and left\n");
-                picar.setMotion(-1.0, 1.0);
+                motorOne--;
             }
-            else if (_keyHoldW)
+            if ((Keyboard.IsKeyDown(Key.D)) || (Keyboard.IsKeyDown(Key.Right)))
             {
-                LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
-                picar.setMotion(0.0, 1.0);
+                motorOne++;
             }
-            else if (_keyHoldS && _keyHoldA)
-            {
-                LogField.AppendText(DateTime.Now + ":\tMoving backwards and left\n");
-                picar.setMotion(1.0, -1.0);
-            }
-            else if (_keyHoldS && _keyHoldD)
-            {
-                LogField.AppendText(DateTime.Now + ":\tMoving backwards and right\n");
-                picar.setMotion(-1.0, -1.0);
-            }
-            else if (_keyHoldS)
-            {
-                LogField.AppendText(DateTime.Now + ":\tMoving backwards\n");
-                picar.setMotion(0.0, -1.0);
-            }
+
+            LogField.AppendText(DateTime.Now + ":\t"+motorTwoDir[(int)motorTwo +1]+" "+ motorOneDir[(int)motorOne + 1] +"\n");
+            picar.setMotion(motorOne, motorTwo);
             LogField.ScrollToEnd();
+            
         }
 
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
@@ -215,7 +217,7 @@ namespace RobotClient
             var picar = (PiCarConnection)deviceListMn.SelectedItem;
             if (picar == null) return;
             var button = (RepeatButton)sender;
-            switch (button.Content)
+            switch (button.Name)
             {
                 case "Forward":
                     LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
@@ -249,7 +251,7 @@ namespace RobotClient
         private void About_Click(object sender, RoutedEventArgs e)
         {
             //TODO rewrite for tutorial information/team
-            MessageBox.Show("Created by various people", "About");
+            MessageBox.Show("Created by Team Robot Follower, of Capstone Project Class 4999 of Fall 2018 \nThe Team consists of:\nEric Ramocki and Sean Ramocki on Desktop Application Developer\nAlex Alwardt and Scott Dudley on Network/Desktop Application Developer \nChristian Nickolaou and Anton Cantoldo on Vehicle Application/Systems Developer", "About");
         }
 
         private void Shutdown_Click(object sender, RoutedEventArgs e)
