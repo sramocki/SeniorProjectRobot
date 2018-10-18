@@ -29,16 +29,18 @@ namespace RobotClient
         TimeSpan _ts;
 
 
-
+        /**
+         *
+         */
         public Registration()
         {
             InitializeComponent();
-            deviceList.ItemsSource = null;
+            DeviceList.ItemsSource = null;
             deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
 
             //Finds default gateway IP
-            deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
+            DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
             foreach (var curInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (curInterface.OperationalStatus != OperationalStatus.Up) continue;
@@ -49,31 +51,39 @@ namespace RobotClient
                 }
             }
             _defaultGateway = _defaultGateway.Substring(0, _defaultGateway.Length - 1);
-            LogFieldReg.AppendText(DateTime.Now + ":\t The gateway IP is " + _defaultGateway + "\n");
+            LogFieldReg.AppendText("The gateway IP is " + _defaultGateway + "\n");
         }
 
+        /**
+         *
+         */
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
             //Send cancellation token
             ScanDevicesAsync();
         }
 
-
+        /**
+         *
+         */
         private void ButtonScanCancel(object sender, RoutedEventArgs e)
         {
-
-           /* while (tasks.Any())
-            {
-                tasks[0].Dispose();
-                tasks.RemoveAt(0);
-            }
-            LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");*/
+            //TODO
+            /* while (tasks.Any())
+             {
+                 tasks[0].Dispose();
+                 tasks.RemoveAt(0);
+             }
+             LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");*/
         }
 
+        /**
+         *
+         */
         public async void ScanDevicesAsync()
         {
             _devicesFound = 0;
-            LogFieldReg.AppendText(DateTime.Now + ":\t"+"Starting Scan for Devices: \n");
+            LogFieldReg.AppendText("Starting Scan for Devices: \n");
 
             var tasks = new List<Task>();
 
@@ -96,6 +106,9 @@ namespace RobotClient
             });
         }
 
+        /**
+         *
+         */
         private async Task AsyncUpdate(Ping ping, string ip)
         {
             var response = await ping.SendPingAsync(ip, timeout);
@@ -110,10 +123,11 @@ namespace RobotClient
                 catch (SocketException e)
                 {
                     deviceName = "Unknown Device at " + ip;
+                    Console.WriteLine(e);
                 }
-                LogFieldReg.AppendText(DateTime.Now + ":\t" + deviceName + " at " + ip + "\n");
+                LogFieldReg.AppendText(deviceName + " at " + ip + "\n");
                 deviceStringList.Add(new[] { deviceName, ip, "Default" });
-                deviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
+                DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
                 lock (_lockObj)
                 {
                     _devicesFound++;
@@ -121,21 +135,27 @@ namespace RobotClient
             }
         }
 
+        /**
+         *
+         */
         private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            var deviceString = deviceList.SelectedItem.ToString();
+            var deviceString = DeviceList.SelectedItem.ToString();
             Console.WriteLine(deviceString);
             var index = deviceStringList.FindIndex(array => array[0] == deviceString);
-            SelectedIP_Box.Text = deviceStringList[index][1];
+            SelectedIpBox.Text = deviceStringList[index][1];
             Console.WriteLine(index);
 
         }
 
+        /**
+         *
+         */
         private void TryConnect(object sender, RoutedEventArgs e)
         {
 
-            var selectedDevice = deviceList.SelectedItem.ToString();
+            var selectedDevice = DeviceList.SelectedItem.ToString();
             var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
 
             //This is the currently selected IP to check
@@ -145,10 +165,10 @@ namespace RobotClient
             //Handle the dummy connection
             if (selectedIP == "127.0.0.1" & selectedName == "Dummy")
             {
-                _mainWindow.LogField.AppendText("Added dummy device for testing\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded dummy device for testing\n");
                 var dummyConnection = new DummyConnection("Dummy", "127.0.0.1");
                 _mainWindow.deviceListMain.Add(dummyConnection);
-                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
+                _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
                 return;
             }
 
@@ -161,17 +181,20 @@ namespace RobotClient
                 newConnection = new PiCarConnection(selectedName, selectedIP);
                 canConnect = newConnection.requestConnect();
             }
-            catch (RpcException rpcE) { }
+            catch (RpcException rpcE)
+            {
+                Console.WriteLine(rpcE);
+            }
 
             if (canConnect)
             {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t"+"Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Connected to " + selectedName + " with IP: " + selectedIP + "\n");
                 _mainWindow.deviceListMain.Add(newConnection);
-                _mainWindow.deviceListMn.ItemsSource = _mainWindow.deviceListMain;
+                _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
             }
             else
             {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t"+"Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
             }
         }
     }
