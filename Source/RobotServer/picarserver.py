@@ -25,7 +25,7 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	def SwitchMode(self, request, context):
 		"""Changes the operating mode of the PiCar"""
 		if (self.mode != request.mode):
-			#If the reuqest is for a different mode, send a success ack
+			#If the reuqest iss for a different mode, send a success ack
 			print('Switching mode from %s to %s' % (self.mode, request.mode))
 			self.mode = request.mode
 			return picar_pb2.ModeAck(success=True)
