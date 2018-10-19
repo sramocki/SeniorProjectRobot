@@ -4,6 +4,7 @@ from concurrent import futures
 import time
 
 import grpc
+import cv2
 
 import picar_pb2
 import picar_pb2_grpc
@@ -19,6 +20,10 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	global mode
 	global throttle
 	global direction
+	
+	def __init__(self):
+		self.streaming = False
+		camera = cv2.VideoCapture(0)
 	
 	def ReceiveConnection(self, request, context):
 		"""Handshake between PiCar and desktop application"""
@@ -44,6 +49,26 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 		throttle = max(-1, min(request.throttle, 1))
 		direction = max(-1, min(request.direction, 1))
 		print('Setting wheels to %f throttle and %f steering' % (throttle, direction))
+		return picar_pb2.Empty()
+		
+	def VideoStream(self, request, context):
+		"""Send back images captured from webcam, encoded as jpeg"""
+		self.streaming = True
+		
+		while(self.streaming):
+			try:
+				grabbed, frame = camera.read() #Get the current frame
+				frame = cv2.resize(frame, (640, 480)) #Resize it to 640x480
+				encoded, buffer = cv2.imencode('.jpg', frame)
+				
+				picar_pb2.ImageCapture(image=buffer) #Create message with image
+				yield buffer #Send it
+				
+			time.sleep(1 / 30) #Wait for 1/30th of a sec
+	
+	def StopStream(self, request, context):
+		"""Stop the sending of a video stream"""
+		self.streaming = False
 		return picar_pb2.Empty()
 		
 def serve():
