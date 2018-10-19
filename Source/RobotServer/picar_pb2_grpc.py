@@ -29,6 +29,16 @@ class PiCarStub(object):
         request_serializer=picar__pb2.SetMotion.SerializeToString,
         response_deserializer=picar__pb2.Empty.FromString,
         )
+    self.VideoStream = channel.unary_stream(
+        '/SeniorProjectRobot.PiCar/VideoStream',
+        request_serializer=picar__pb2.StartVideoStream.SerializeToString,
+        response_deserializer=picar__pb2.ImageCapture.FromString,
+        )
+    self.StopStream = channel.unary_unary(
+        '/SeniorProjectRobot.PiCar/StopStream',
+        request_serializer=picar__pb2.EndVideoStream.SerializeToString,
+        response_deserializer=picar__pb2.Empty.FromString,
+        )
 
 
 class PiCarServicer(object):
@@ -56,6 +66,20 @@ class PiCarServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def VideoStream(self, request, context):
+    """Begin video streaming
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def StopStream(self, request, context):
+    """End video streaming
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_PiCarServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -72,6 +96,16 @@ def add_PiCarServicer_to_server(servicer, server):
       'RemoteControl': grpc.unary_unary_rpc_method_handler(
           servicer.RemoteControl,
           request_deserializer=picar__pb2.SetMotion.FromString,
+          response_serializer=picar__pb2.Empty.SerializeToString,
+      ),
+      'VideoStream': grpc.unary_stream_rpc_method_handler(
+          servicer.VideoStream,
+          request_deserializer=picar__pb2.StartVideoStream.FromString,
+          response_serializer=picar__pb2.ImageCapture.SerializeToString,
+      ),
+      'StopStream': grpc.unary_unary_rpc_method_handler(
+          servicer.StopStream,
+          request_deserializer=picar__pb2.EndVideoStream.FromString,
           response_serializer=picar__pb2.Empty.SerializeToString,
       ),
   }
