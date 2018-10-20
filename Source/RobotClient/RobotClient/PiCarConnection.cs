@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Grpc.Core;
 
@@ -11,21 +8,21 @@ namespace RobotClient
     {
         private class PiCarClient
         {
-            readonly PiCar.PiCarClient client;
+            private readonly PiCar.PiCarClient _client;
 
             public PiCarClient(PiCar.PiCarClient client)
             {
-                this.client = client;
+                _client = client;
             }
 
             //Request a connection to the PiCar server. Return success
-            public bool requestConnect()
+            public bool RequestConnect()
             {
                 try
                 {
                     //Attempt connection to PiCar server
-                    ConnectRequest request = new ConnectRequest { Message = "Desktop App" };
-                    ConnectAck ack = client.ReceiveConnection(request);
+                    var request = new ConnectRequest {Message = "Desktop App"};
+                    var ack = _client.ReceiveConnection(request);
 
                     return ack.Success;
                 }
@@ -37,12 +34,12 @@ namespace RobotClient
             }
 
             //Set the mode of the PiCar, return success
-            public bool setMode(ModeRequest.Types.Mode mode)
+            public bool SetMode(ModeRequest.Types.Mode mode)
             {
                 try
                 {
-                    ModeRequest request = new ModeRequest { Mode = mode };
-                    ModeAck ack = client.SwitchMode(request);
+                    var request = new ModeRequest {Mode = mode};
+                    var ack = _client.SwitchMode(request);
 
                     return ack.Success;
                 }
@@ -54,13 +51,13 @@ namespace RobotClient
             }
 
             //Send a signal to the PiCar telling it how to move its wheels
-            public void setMotion(double throttle, double direction)
+            public void SetMotion(double throttle, double direction)
             {
                 try
                 {
                     //Send a control signal to the PiCar
-                    SetMotion request = new SetMotion { Throttle = throttle, Direction = direction };
-                    client.RemoteControl(request);
+                    var request = new SetMotion {Throttle = throttle, Direction = direction};
+                    _client.RemoteControl(request);
                 }
                 catch (RpcException e)
                 {
@@ -70,79 +67,79 @@ namespace RobotClient
             }
         }
 
-        private Channel channel;
-        private PiCarClient client;
-        public string name;
+        private Channel _channel;
+        private PiCarClient _client;
+        public string Name;
         public string ipAddress;
-        public ModeRequest.Types.Mode mode;
+        public ModeRequest.Types.Mode Mode;
 
         public PiCarConnection()
         {
-            name = "Default";
+            Name = "Default";
             ipAddress = "127.0.0.1";
-            mode = ModeRequest.Types.Mode.Idle;
+            Mode = ModeRequest.Types.Mode.Idle;
         }
 
         public PiCarConnection(string name, string ipAddress)
         {
-            this.name = name;
+            this.Name = name;
             this.ipAddress = ipAddress;
-            channel = new Channel(ipAddress + ":50051", ChannelCredentials.Insecure);
-            client = new PiCarClient(new PiCar.PiCarClient(channel));
-            mode = ModeRequest.Types.Mode.Idle; //Start in Idle mode
+            _channel = new Channel(ipAddress + ":50051", ChannelCredentials.Insecure);
+            _client = new PiCarClient(new PiCar.PiCarClient(_channel));
+            Mode = ModeRequest.Types.Mode.Idle; //Start in Idle mode
         }
 
-        public virtual bool requestConnect()
+        public virtual bool RequestConnect()
         {
-            return client.requestConnect();
+            return _client.RequestConnect();
         }
 
-        public virtual void setMode(ModeRequest.Types.Mode mode)
+        public virtual void SetMode(ModeRequest.Types.Mode mode)
         {
-            bool success = client.setMode(mode);
+            var success = _client.SetMode(mode);
             //Change local mode if successful
             if (success)
-                this.mode = mode;
+                Mode = mode;
         }
 
-        public virtual void setMotion(double throttle, double direction)
+        public virtual void SetMotion(double throttle, double direction)
         {
-            client.setMotion(throttle, direction);
+            _client.SetMotion(throttle, direction);
         }
 
         public override string ToString()
         {
-            return name;
+            return Name;
         }
 
         public async Task Shutdown()
         {
-            await channel.ShutdownAsync();
+            await _channel.ShutdownAsync();
         }
     }
 
     public class DummyConnection : PiCarConnection
-    { 
+    {
         public DummyConnection(string name, string ipAddress)
         {
-            this.name = name;
+            Name = name;
             this.ipAddress = ipAddress;
-            mode = ModeRequest.Types.Mode.Idle;
+            Mode = ModeRequest.Types.Mode.Idle;
         }
 
-        public override bool requestConnect()
+        public override bool RequestConnect()
         {
             return true;
         }
 
-        public override void setMode(ModeRequest.Types.Mode mode)
+        public override void SetMode(ModeRequest.Types.Mode mode)
         {
-            this.mode = mode;
+            Mode = mode;
         }
 
-        public override void setMotion(double throttle, double direction)
+        public override void SetMotion(double throttle, double direction)
         {
-            //Do Nothing
+            Console.WriteLine(Name + " Moving");
         }
     }
 }

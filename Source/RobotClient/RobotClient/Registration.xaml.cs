@@ -179,7 +179,7 @@ namespace RobotClient
             try
             {
                 newConnection = new PiCarConnection(selectedName, selectedIP);
-                canConnect = newConnection.requestConnect();
+                canConnect = newConnection.RequestConnect();
             }
             catch (RpcException rpcE)
             {

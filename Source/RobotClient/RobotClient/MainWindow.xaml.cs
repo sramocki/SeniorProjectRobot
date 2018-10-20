@@ -108,7 +108,7 @@ namespace RobotClient
         private void ControllerMovement()
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var state = _controller.GetState().Gamepad;
             if (state.LeftThumbX.Equals(_previousState.LeftThumbX) &&
                 state.LeftTrigger.Equals(_previousState.LeftTrigger) &&
@@ -138,7 +138,7 @@ namespace RobotClient
 
             LogField.AppendText(DateTime.Now + ":\tMotor 1: " + _motor1Controller + "\tMotor 2: " + _motor2Controller + "\n");
             LogField.ScrollToEnd();
-            picar.setMotion(_motor1Controller, _motor2Controller);
+            picar.SetMotion(_motor1Controller, _motor2Controller);
             _previousState = state;
         }
 
@@ -148,7 +148,7 @@ namespace RobotClient
         private void Key_down(object sender, KeyEventArgs e)
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             if (e.IsRepeat) return;
 
             var motorOne = 0.0;
@@ -168,7 +168,7 @@ namespace RobotClient
 
             LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " +
                                 motorOneDir[(int)motorOne + 1] + "\n");
-            picar.setMotion(motorOne, motorTwo);
+            picar.SetMotion(motorOne, motorTwo);
             LogField.ScrollToEnd();
         }
 
@@ -178,7 +178,7 @@ namespace RobotClient
         private void Key_up(object sender, KeyEventArgs e)
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
 
             var motorOne = 0.0;
             var motorTwo = 0.0;
@@ -196,7 +196,7 @@ namespace RobotClient
 
             LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " +
                                 motorOneDir[(int)motorOne + 1] + "\n");
-            picar.setMotion(motorOne, motorTwo);
+            picar.SetMotion(motorOne, motorTwo);
             LogField.ScrollToEnd();
         }
 
@@ -205,29 +205,30 @@ namespace RobotClient
          */
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
+            //TODO add button up event for stop command
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var button = (RepeatButton)sender;
             switch (button.Name)
             {
                 case "Forward":
                     LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
-                    picar.setMotion(1.0, 0.0);
+                    picar.SetMotion(1.0, 0.0);
                     break;
 
                 case "Backwards":
                     LogField.AppendText(DateTime.Now + ":\tMoving backwards\n");
-                    picar.setMotion(-1.0, 0.0);
+                    picar.SetMotion(-1.0, 0.0);
                     break;
 
                 case "Left":
                     LogField.AppendText(DateTime.Now + ":\tMoving left\n");
-                    picar.setMotion(0.0, -1.0);
+                    picar.SetMotion(0.0, -1.0);
                     break;
 
                 case "Right":
                     LogField.AppendText(DateTime.Now + ":\tMoving right\n");
-                    picar.setMotion(0.0, 1.0);
+                    picar.SetMotion(0.0, 1.0);
                     break;
 
                 default:
@@ -272,7 +273,7 @@ namespace RobotClient
 
             //Update ipBox and deviceStatus with it's info
             IpBox.Text = picar.ipAddress;
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
         }
 
         /**
@@ -286,9 +287,9 @@ namespace RobotClient
             Console.WriteLine("Setting " + picar + "as Leader");
 
             //Send message to picar to change modes
-            picar.setMode(ModeRequest.Types.Mode.Lead);
+            picar.SetMode(ModeRequest.Types.Mode.Lead);
             //Update deviceStatus
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
         }
 
         /**
@@ -302,9 +303,9 @@ namespace RobotClient
             Console.WriteLine("Setting " + picar + "as Follower");
 
             //Send message to picar to change modes
-            picar.setMode(ModeRequest.Types.Mode.Follow);
+            picar.SetMode(ModeRequest.Types.Mode.Follow);
             //Update deviceStatus
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
         }
 
         /**
@@ -318,9 +319,20 @@ namespace RobotClient
             Console.WriteLine("Setting " + picar + "as Idle");
 
             //Send message to picar to change modes
-            picar.setMode(ModeRequest.Types.Mode.Idle);
+            picar.SetMode(ModeRequest.Types.Mode.Idle);
             //Update deviceStatus
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
+        }
+
+        private void SelectLeaders_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var t in DeviceListMn.Items)
+            {
+                if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
+                {
+                    DeviceListMn.SelectedItems.Add(temp);
+                }
+            }
         }
 
         #region Properties
