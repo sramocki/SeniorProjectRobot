@@ -8,13 +8,17 @@ import grpc
 import picar_pb2
 import picar_pb2_grpc
 
+#Variables to control this picar's behavior
+mode = 0
+throttle = 0
+direction = 0
+
 class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	"""Provides methods that implement functionality of PiCar server."""
 	
-	def __init__(self):
-		self.mode = 'IDLE'
-		self.throttle = 0
-		self.direction = 0
+	global mode
+	global throttle
+	global direction
 	
 	def ReceiveConnection(self, request, context):
 		"""Handshake between PiCar and desktop application"""
@@ -25,9 +29,9 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	def SwitchMode(self, request, context):
 		"""Changes the operating mode of the PiCar"""
 		if (self.mode != request.mode):
-			#If the reuqest is for a different mode, send a success ack
-			print('Switching mode from %s to %s' % (self.mode, request.mode))
-			self.mode = request.mode
+			#If the reuqest iss for a different mode, send a success ack
+			print('Switching mode from %s to %s' % (mode, request.mode))
+			mode = request.mode
 			return picar_pb2.ModeAck(success=True)
 		else:
 			#If the request is for the mode already in, send a failure ack
@@ -37,9 +41,9 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	def RemoteControl(self, request, context):
 		"""Receive control data from desktop application"""
 		#Clamp the input throttle and direction to [-1, 1]
-		self.throttle = max(-1, min(request.throttle, 1))
-		self.direction = max(-1, min(request.direction, 1))
-		print('Setting wheels to %f throttle and %f steering' % (self.throttle, self.direction))
+		throttle = max(-1, min(request.throttle, 1))
+		direction = max(-1, min(request.direction, 1))
+		print('Setting wheels to %f throttle and %f steering' % (throttle, direction))
 		return picar_pb2.Empty()
 		
 def serve():
