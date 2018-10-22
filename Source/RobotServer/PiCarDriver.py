@@ -98,6 +98,6 @@ def test():
 
 if __name__ == '__main__':
     try:
-        test()
+        main()
     except KeyboardInterrupt():
         destroy()
