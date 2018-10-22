@@ -15,6 +15,12 @@ service PiCar {
 	
 	//Receive control data from desktop application
 	rpc RemoteControl(SetMotion) returns (Empty) {}
+	
+	//Begin video streaming
+	rpc VideoStream(StartVideoStream) returns (stream ImageCapture) {}
+	
+	//End video streaming
+	rpc StopStream(EndVideoStream) returns (Empty) {}
 }
 
 //An empty message
@@ -62,5 +68,16 @@ message SetMotion {
 	double direction = 2;
 }
 
-//TODO: Web cam feed stream
+message StartVideoStream {
+	//Message to indicate to begin streaming video
+}
+
+message ImageCapture {
+	//A bytestring containing the image data
+	bytes image = 1;
+}
+
+message EndVideoStream {
+	//Message to indiciate to stop streaming video
+}
 
