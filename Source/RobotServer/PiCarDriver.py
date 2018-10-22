@@ -11,13 +11,16 @@ picar.setup()
 rear_wheels_enabled = True
 front_wheels_enabled = True
 
-FW_ANGLE_MAX = 90+30
-FW_ANGLE_MIN = 90-30
+
 
 fw = front_wheels.Front_Wheels()
+fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 
-fw.offset = 0
-fw.turn(90)
+FW_ANGLE_MAX = fw_default+30
+FW_ANGLE_MIN = fw_default-30
+
+#fw.offset = 0
+fw.turn(fw_default)
 
 mode = 'IDLE'
 throttle = 0
