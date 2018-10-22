@@ -47,7 +47,7 @@ def main():
             break
 
         # get reference to current mode
-        global mode = picarserver.mode
+        mode = picarserver.mode
 
         if mode == 'LEADER':
             # leader mode
