@@ -41,10 +41,10 @@ def main():
     while True:
 
         #check if key pressed
-        #k = cv2.waitKey(1) & 0xFF
+        k = cv2.waitKey(1) & 0xFF
 
         #if q key is pressed we break loop
-        #if k == ord('q'):
+        if k == ord('q'):
             #break
 
         # get reference to current mode
@@ -62,8 +62,8 @@ def main():
         else:
             # idle mode
             print "picar set to IDLE"
-            time.sleep(1)
-
+        #wait 1 second after loop    
+        time.sleep(1)
     #cleanup    
     destroy()
 
