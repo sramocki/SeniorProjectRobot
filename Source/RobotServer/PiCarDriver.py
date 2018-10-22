@@ -40,7 +40,7 @@ def main():
     while True:
 
         #check if key pressed
-        k = cv.waitKey(1) & 0xFF
+        k = cv2.waitKey(1) & 0xFF
 
         #if q key is pressed we break loop
         if k == ord('q'):
