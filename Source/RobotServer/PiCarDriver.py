@@ -1,11 +1,10 @@
-from picar import front_wheels, back_wheels
+from picar import front_wheels
 import picar
-import cv2 as cv
+import cv2
 from concurrent import futures
 import time
-import argparse
 import picarserver
-
+import picarhelper
 
 picar.setup()
 rear_wheels_enabled = True
@@ -14,16 +13,14 @@ front_wheels_enabled = True
 FW_ANGLE_MAX = 90+30
 FW_ANGLE_MIN = 90-30
 
-bw = back_wheels.Back_Wheels()
 fw = front_wheels.Front_Wheels()
 
 fw.offset = 0
 fw.turn(90)
-bw.speed = 0
 
-motor_speed = 60
-fw_angle = 90 #straight
 
+#get a reference to the camera, default is 0
+camera = cv2.VideoCapture(0)
 frame = None
 roiPts = []
 inputMode = False
@@ -34,76 +31,65 @@ direction = 0
 
 def main():
 
-    server = PiCarServicer()
+    #start the server
     picarserver.serve()
 
-    # get a reference to the camera, default is 0
-    camera = cv2.VideoCapture(0)
+    print "Server Started\n"
+    print "Press q to cancel"
 
-    # loop over frames
+    # loop unless break occurs
     while True:
 
+        #check if key pressed
+        k = cv.waitKey(1) & 0xFF
+
+        #if q key is pressed we break loop
+        if k == ord('q'):
+            break
+
         # get reference to current mode
-        global mode = server.mode
+        global mode = picarserver.mode
 
         if mode == 'LEADER':
             # leader mode
+            move(picarserver.throttle, picarserver.direction)
 
         elif mode == 'FOLLOWER':
             # follower mode
-            #grab the current frame from the camera
-            (grabbed, frame) = camera.read()
-
-            # if there is no frame to get from the camera, break
-            if not grabbed:
-                break
-
-            # display frames
-            cv2.imshow("frame", frame)
-
-            #record if the user presses a key
-            key = cv2.waitKey(1) & 0xFF
-
-            if key == ord("q"):
-                break
+             
         else:
             # idle mode
 
-        
-
-
-    print "Begin drive!"
-    move(0.6,0.0)
-    time.sleep(3)
-    ## wait for input
-    #python 2
-    #raw_input("Press enter to stop the car")
-    #python 3
-    #input("Press enter to stop the car")
-    move(0.0,0.0)
-    print "End Drive"
-
-    camera.release()
-    cv2.destroyAllWindows()
-
+    #cleanup    
+    destroy()
 
 def move(throttle, direction):
     motor_speed = abs(throttle)*100
-    bw.speed = motor_speed
 
     fw_angle = 90-30*(direction)
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
     if rear_wheels_enabled:
         if (throttle > 0.0):
-            bw.forward()
+            picarhelper.move_forward(motor_speed)
         elif (throttle < 0.0):
-            bw.backward()
+            picarhelper.move_backwards(motor_speed)
         else:
-            bw.stop()
+            picarhelper.stop()
 
 def destroy():
-    bw.stop()
+    picarhelper.stop()
+    camera.release()
+    cv2.destroyAllWindows()
+
+def test():
+    print "Begin Test!"
+    move(0.5, 0.0)
+    time.sleep(1)
+    move(-0.5, 0.0)
+    time.sleep(1)
+    print "End Test!"
+    destroy()
 
 if __name__ == '__main__':
     try:
