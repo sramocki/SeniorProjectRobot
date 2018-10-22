@@ -36,6 +36,7 @@ def main():
     print "Server Started on "+socket.gethostname()+"\n"
     print "Press q to cancel"
 
+    move(0.0,0.0)
     # loop unless break occurs
     while True:
 
