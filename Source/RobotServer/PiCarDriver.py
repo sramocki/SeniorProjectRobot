@@ -7,7 +7,7 @@ import picarserver
 import picarhelper
 import socket
 
-picar.setup()
+#picar.setup()
 rear_wheels_enabled = True
 front_wheels_enabled = True
 
