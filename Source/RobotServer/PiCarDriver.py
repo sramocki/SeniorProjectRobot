@@ -11,8 +11,6 @@ picar.setup()
 rear_wheels_enabled = True
 front_wheels_enabled = True
 
-
-
 fw = front_wheels.Front_Wheels()
 fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 
@@ -68,8 +66,8 @@ def main():
 
 def move(throttle, direction):
     motor_speed = abs(throttle)*100
-
-    fw_angle = 90-30*(direction)
+    fw_angle = fw_default-30*(direction)
+    
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
     if rear_wheels_enabled:
@@ -91,6 +89,7 @@ def test():
     time.sleep(1)
     move(-0.5, 0.0)
     time.sleep(1)
+    move(0.0,0.0)
     print "End Test!"
     destroy()
 

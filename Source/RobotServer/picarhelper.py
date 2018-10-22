@@ -15,6 +15,6 @@ def stop():
 
 def getDefaultAngle(hostname):
     if hostname == 'picarA':
-        return 95
+        return 90
     elif hostname == 'picarB':
         return 90
