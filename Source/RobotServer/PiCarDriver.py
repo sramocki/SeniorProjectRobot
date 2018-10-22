@@ -18,7 +18,7 @@ FW_ANGLE_MAX = fw_default+30
 FW_ANGLE_MIN = fw_default-30
 
 #fw.offset = 0
-fw.turn(fw_default)
+#fw.turn(fw_default)
 
 mode = 'IDLE'
 
