@@ -17,10 +17,6 @@ direction = 0
 class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	"""Provides methods that implement functionality of PiCar server."""
 	
-	global mode
-	global throttle
-	global direction
-	
 	def __init__(self):
 		self.streaming = False
 		self.camera = cv2.VideoCapture(0)
@@ -33,8 +29,9 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 
 	def SwitchMode(self, request, context):
 		"""Changes the operating mode of the PiCar"""
+		global mode
 		if (mode != request.mode):
-			#If the reuqest iss for a different mode, send a success ack
+			#If the request is for a different mode, send a success ack
 			print('Switching mode from %s to %s' % (mode, request.mode))
 			mode = request.mode
 			return picar_pb2.ModeAck(success=True)
@@ -46,6 +43,8 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	def RemoteControl(self, request, context):
 		"""Receive control data from desktop application"""
 		#Clamp the input throttle and direction to [-1, 1]
+		global throttle
+		global direction
 		throttle = max(-1, min(request.throttle, 1))
 		direction = max(-1, min(request.direction, 1))
 		print('Setting wheels to %f throttle and %f steering' % (throttle, direction))
@@ -73,13 +72,15 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 		print('Stopping video stream')
 		return picar_pb2.Empty()
 		
-def serve():
+def getServer():
 	server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 	picar_pb2_grpc.add_PiCarServicer_to_server(
 		PiCarServicer(), server)
 	server.add_insecure_port('[::]:50051')
-	server.start()
-	print('PiCar server started.')
+	return server
 			
 if __name__ == '__main__':
-	serve();
+	server = getServer()
+	server.start()
+	print('Server started')
+	sleep(60*60*24)
