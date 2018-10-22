@@ -86,9 +86,9 @@ def destroy():
 
 def test():
     print "Begin Test!"
-    move(0.5, 0.0)
+    move(0.0, 0.5)
     time.sleep(1)
-    move(-0.5, 0.0)
+    move(0.0, -0.5)
     time.sleep(1)
     move(0.0,0.0)
     print "End Test!"
@@ -96,6 +96,6 @@ def test():
 
 if __name__ == '__main__':
     try:
-        main()
+        test()
     except KeyboardInterrupt():
         destroy()
