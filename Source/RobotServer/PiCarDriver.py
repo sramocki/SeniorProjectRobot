@@ -86,6 +86,8 @@ def destroy():
 
 def test():
     print "Begin Test!"
+    move(0.0,0.0)
+    time.sleep(1)
     move(0.0, 1.0)
     time.sleep(1)
     move(0.0, -1.0)
