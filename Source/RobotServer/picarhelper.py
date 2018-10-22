@@ -18,3 +18,7 @@ def getDefaultAngle(hostname):
         return 95
     elif hostname == 'picarB':
         return 90
+
+"""
+Wheel angle above 90 is to the right, below 90 is to the left
+"""
