@@ -12,3 +12,9 @@ def move_backward(speed):
 
 def stop():
     bw.stop()
+
+def getDefaultAngle(hostname):
+    if hostname == 'picarA':
+        return 95
+    elif hostname == 'picarB':
+        return 90
