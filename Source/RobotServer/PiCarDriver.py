@@ -45,7 +45,7 @@ def main():
 
         #if q key is pressed we break loop
         if k == ord('q'):
-            #break
+            break
 
         # get reference to current mode
         mode = picarserver.mode
@@ -62,6 +62,7 @@ def main():
         else:
             # idle mode
             print "picar set to IDLE"
+        
         #wait 1 second after loop    
         time.sleep(1)
     #cleanup    
