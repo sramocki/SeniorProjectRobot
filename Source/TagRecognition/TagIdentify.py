@@ -23,12 +23,12 @@ while(True):
     cv2.imshow('frame', theGray)
     
     
-    seenMarkers, ids, rejectedImgPoints = cv2.aruco.detectMarkers(theGray, arDict, parameters=parameters)
+    seenMarkers = cv2.aruco.detectMarkers(theGray, arDict)
     
     
     
-    if len(ids[0]) > 0:
-        cv2.aruco.drawDetectedMarkers(theGray,ids[0],ids[1])
+    if len(seenMarkers[0]) > 0:
+        cv2.aruco.drawDetectedMarkers(theGray,seenMarkers[0],seenMarkers[1])
     
     
     
