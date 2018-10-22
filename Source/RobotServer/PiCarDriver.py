@@ -57,11 +57,12 @@ def main():
 
         elif mode == 'FOLLOWER':
             # follower mode
-            #print "picar set to FOLLOWER"
+            print "picar set to FOLLOWER"
              
-        #else:
+        else:
             # idle mode
-            #print "picar set to IDLE"
+            print "picar set to IDLE"
+            time.sleep(1)
 
     #cleanup    
     destroy()
