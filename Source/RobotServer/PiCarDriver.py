@@ -35,7 +35,7 @@ def main():
 
     print "Server Started on "+socket.gethostname()+"\n"
     print "Press Ctrl-C to quit"
-    
+
     move(0.0,0.0)
     # loop unless break occurs
     while True:
@@ -59,7 +59,7 @@ def main():
             # follower mode
             #print "picar set to FOLLOWER"
              
-        else:
+        #else:
             # idle mode
             #print "picar set to IDLE"
 
