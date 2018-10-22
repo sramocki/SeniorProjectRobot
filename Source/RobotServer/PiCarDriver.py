@@ -5,6 +5,7 @@ from concurrent import futures
 import time
 import picarserver
 import picarhelper
+import socket
 
 picar.setup()
 rear_wheels_enabled = True
@@ -18,6 +19,9 @@ fw = front_wheels.Front_Wheels()
 fw.offset = 0
 fw.turn(90)
 
+mode = 'IDLE'
+throttle = 0
+direction = 0
 
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
@@ -25,16 +29,12 @@ frame = None
 roiPts = []
 inputMode = False
 
-mode = 'IDLE'
-throttle = 0
-direction = 0
-
 def main():
 
     #start the server
     picarserver.serve()
 
-    print "Server Started\n"
+    print "Server Started on "+socket.gethostname()+"\n"
     print "Press q to cancel"
 
     # loop unless break occurs
