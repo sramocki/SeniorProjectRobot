@@ -34,34 +34,33 @@ def main():
     picarserver.serve()
 
     print "Server Started on "+socket.gethostname()+"\n"
-    print "Press q to cancel"
 
     move(0.0,0.0)
     # loop unless break occurs
     while True:
 
         #check if key pressed
-        k = cv2.waitKey(1) & 0xFF
+        #k = cv2.waitKey(1) & 0xFF
 
         #if q key is pressed we break loop
-        if k == ord('q'):
-            break
+        #if k == ord('q'):
+            #break
 
         # get reference to current mode
         mode = picarserver.mode
 
         if mode == 'LEADER':
             # leader mode
-            print "picar set to LEADER"
+            #print "picar set to LEADER"
             move(picarserver.throttle, picarserver.direction)
 
         elif mode == 'FOLLOWER':
             # follower mode
-            print "picar set to FOLLOWER"
+            #print "picar set to FOLLOWER"
              
         else:
             # idle mode
-            print "picar set to IDLE"
+            #print "picar set to IDLE"
 
     #cleanup    
     destroy()
