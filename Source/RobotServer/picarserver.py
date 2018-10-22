@@ -80,11 +80,6 @@ def serve():
 	server.add_insecure_port('[::]:50051')
 	server.start()
 	print('PiCar server started.')
-	try:
-		while True:
-			sleep(60 * 60 * 24)
-	except KeyboardInterrupt:
-			server.stop(0)
 			
 if __name__ == '__main__':
 	serve();
