@@ -21,8 +21,6 @@ FW_ANGLE_MIN = fw_default-30
 fw.turn(fw_default)
 
 mode = 'IDLE'
-throttle = 0
-direction = 0
 
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
@@ -53,21 +51,24 @@ def main():
 
         if mode == 'LEADER':
             # leader mode
+            print "picar set to LEADER"
             move(picarserver.throttle, picarserver.direction)
 
         elif mode == 'FOLLOWER':
             # follower mode
+            print "picar set to FOLLOWER"
              
         else:
             # idle mode
+            print "picar set to IDLE"
 
     #cleanup    
     destroy()
 
 def move(throttle, direction):
     motor_speed = abs(throttle)*100
-    fw_angle = fw_default-30*(direction)
-    
+    fw_angle = fw_default-(30*(direction))
+
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
     if rear_wheels_enabled:
