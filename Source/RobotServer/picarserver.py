@@ -1,7 +1,7 @@
 """Server run on each PiCar to listen to desktop application commands"""
 
 from concurrent import futures
-import time
+from time import sleep
 
 import grpc
 import cv2
@@ -23,7 +23,7 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	
 	def __init__(self):
 		self.streaming = False
-		camera = cv2.VideoCapture(0)
+		self.camera = cv2.VideoCapture(0)
 	
 	def ReceiveConnection(self, request, context):
 		"""Handshake between PiCar and desktop application"""
@@ -33,7 +33,7 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 
 	def SwitchMode(self, request, context):
 		"""Changes the operating mode of the PiCar"""
-		if (self.mode != request.mode):
+		if (mode != request.mode):
 			#If the reuqest iss for a different mode, send a success ack
 			print('Switching mode from %s to %s' % (mode, request.mode))
 			mode = request.mode
@@ -54,21 +54,23 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	def VideoStream(self, request, context):
 		"""Send back images captured from webcam, encoded as jpeg"""
 		self.streaming = True
+		print('Starting video stream')
 		
 		while(self.streaming):
-			try:
-				grabbed, frame = camera.read() #Get the current frame
-				frame = cv2.resize(frame, (640, 480)) #Resize it to 640x480
-				encoded, buffer = cv2.imencode('.jpg', frame)
-				
-				picar_pb2.ImageCapture(image=buffer) #Create message with image
-				yield buffer #Send it
-				
-			time.sleep(1 / 30) #Wait for 1/30th of a sec
+			grabbed, frame = self.camera.read() #Get the current frame
+			frame = cv2.resize(frame, (640, 480)) #Resize it to 640x480
+			encoded, buffer = cv2.imencode('.jpg', frame)
+			bytes = buffer.tobytes()
+			
+			message = picar_pb2.ImageCapture(image=bytes) #Create message with image
+			#print('Sending frame')
+			yield message #Send it				
+			sleep(1 / 30) #Wait for 1/30th of a sec
 	
 	def StopStream(self, request, context):
 		"""Stop the sending of a video stream"""
 		self.streaming = False
+		print('Stopping video stream')
 		return picar_pb2.Empty()
 		
 def serve():
@@ -80,7 +82,7 @@ def serve():
 	print('PiCar server started.')
 	try:
 		while True:
-			time.sleep(60 * 60 * 24)
+			sleep(60 * 60 * 24)
 	except KeyboardInterrupt:
 			server.stop(0)
 			
