@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,9 @@ using System.Windows;
 using System.Windows.Controls;
 using Grpc.Core;
 using System.ComponentModel;
+using System.Windows.Forms;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 
 namespace RobotClient
@@ -51,7 +55,9 @@ namespace RobotClient
             InitializeBackgroundWorker();
             backgroundWorker1.WorkerSupportsCancellation = true;
             DeviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
+            deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
 
             //Finds default gateway IP
@@ -250,40 +256,43 @@ namespace RobotClient
             var selectedIP = deviceStringList[index][1];
             var selectedName = deviceStringList[index][0];
 
-            //Handle the dummy connection
-            if (selectedIP == "127.0.0.1" & selectedName == "Dummy")
-            {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded dummy device for testing\n");
-                var dummyConnection = new DummyConnection("Dummy", "127.0.0.1");
-                _mainWindow.deviceListMain.Add(dummyConnection);
-                _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
-                return;
-            }
-
-            //Handle a regular connection
-            var canConnect = false;
+            DummyConnection dummy = null;
             PiCarConnection newConnection = null;
+            var canConnect = false;
 
-            try
+            //Handle the dummy connection
+            if (selectedIP == "N/A")
             {
-                newConnection = new PiCarConnection(selectedName, selectedIP);
-                canConnect = newConnection.RequestConnect();
-            }
-            catch (RpcException rpcE)
-            {
-                Console.WriteLine(rpcE);
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded " + selectedName + "for testing\n");
+                var dummyConnection = new DummyConnection(selectedName, selectedIP);
+                _mainWindow.deviceListMain.Add(dummyConnection);
             }
 
-            if (canConnect)
-            {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Connected to " + selectedName + " with IP: " + selectedIP + "\n");
-                _mainWindow.deviceListMain.Add(newConnection);
-                _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
-            }
             else
             {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                try
+                {
+                    newConnection = new PiCarConnection(selectedName, selectedIP);
+                    canConnect = newConnection.RequestConnect();
+                }
+                catch (RpcException rpcE)
+                {
+                    Console.WriteLine(rpcE);
+                }
+
+                if (canConnect)
+                {
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+                    _mainWindow.deviceListMain.Add(newConnection);
+                }
+                else
+                {
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                }
             }
+
+            _mainWindow.DeviceListMn.ItemsSource = null;
+            _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
         }
     }
 }
