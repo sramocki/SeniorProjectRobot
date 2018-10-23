@@ -89,7 +89,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles importing data written from a locally saved log file, and outputs it into the current log field.
          */
         private void ImportData_Click(object sender, RoutedEventArgs e)
         {
@@ -103,7 +103,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles the controller input for variable speed and direction
          */
         private void ControllerMovement()
         {
@@ -143,7 +143,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles when one or more key is pressed down (Vehicle is moving in one or more directions)
          */
         private void Key_down(object sender, KeyEventArgs e)
         {
@@ -173,7 +173,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles when one or more key is released (Vehicle is stopping in one or more directions)
          */
         private void Key_up(object sender, KeyEventArgs e)
         {
@@ -201,7 +201,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles when the GUI buttons are held down (Vehicle is moving a single direction)
          */
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
@@ -237,6 +237,9 @@ namespace RobotClient
             LogField.ScrollToEnd();
         }
 
+        /**
+         *  Method that handles when the GUI button is released (Vehicle is stopped)
+         */
         private void ButtonPress_Released(object sender, RoutedEventArgs e)
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
@@ -247,7 +250,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that opens a message box with 'About' information
          */
         private void About_Click(object sender, RoutedEventArgs e)
         {
@@ -258,10 +261,23 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles shutdown confirmation
          */
         private void Shutdown_Click(object sender, RoutedEventArgs e)
         {
+            if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) ==
+                MessageBoxResult.Yes)
+
+                Application.Current.Shutdown();
+        }
+
+        /**
+         * Method that handles shutdown confirmation
+         */
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            //TODO add saving confirmation of log data
             if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
                     MessageBoxImage.Question) ==
                 MessageBoxResult.Yes)

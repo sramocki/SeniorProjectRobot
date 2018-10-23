@@ -6,6 +6,7 @@
         KeyDown="Key_down"
         KeyUp="Key_up"
         mc:Ignorable="d"
+        Closing="Window_Closing"
         Title="Robot Client" Height="800" Width="800" ResizeMode="NoResize">
     <Grid>
 
