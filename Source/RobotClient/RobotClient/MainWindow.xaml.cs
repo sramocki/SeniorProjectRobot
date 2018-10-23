@@ -205,7 +205,6 @@ namespace RobotClient
          */
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
-            //TODO add button up event for stop command
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var button = (RepeatButton)sender;
@@ -232,9 +231,18 @@ namespace RobotClient
                     break;
 
                 default:
-                    Console.WriteLine(DateTime.Now + ":\tThis wasn't supposed to happen..");
+                    Console.WriteLine("Mistakes were made");
                     break;
             }
+            LogField.ScrollToEnd();
+        }
+
+        private void ButtonPress_Released(object sender, RoutedEventArgs e)
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            LogField.AppendText(DateTime.Now + ":\tNow In Neutral\n");
+            picar.SetMotion(0.0, 0.0);
             LogField.ScrollToEnd();
         }
 
