@@ -19,7 +19,7 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.LayoutTransform>
-        <Button Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="0,17,0,0" VerticalAlignment="Top" Width="294" Height="29" Grid.ColumnSpan="2"/>
+        <Button x:Name="buttonScan" Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="0,17,0,0" VerticalAlignment="Top" Width="294" Height="29" Grid.ColumnSpan="2"/>
         <ListBox Name="DeviceList" HorizontalAlignment="Left" Height="172" Margin="0,122,0,0" VerticalAlignment="Top" Width="284" SelectionChanged="DeviceList_SelectionChanged" FontSize="11" Grid.ColumnSpan="2"
                  Grid.Column="0" HorizontalContentAlignment="Center"/>
         <Label Grid.Column="0" Name="IpLabel" Content="Device List" HorizontalAlignment="Left" Margin="106,93,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.156,0.64"/>
