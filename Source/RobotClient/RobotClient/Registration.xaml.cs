@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Grpc.Core;
+using System.ComponentModel;
 
 
 namespace RobotClient
@@ -27,14 +28,28 @@ namespace RobotClient
         static object _lockObj = new object();
         Stopwatch _stopWatch = new Stopwatch();
         TimeSpan _ts;
+        private BackgroundWorker backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
 
 
         /**
          *
          */
+
+        private void InitializeBackgroundWorker()
+        {
+            backgroundWorker1.DoWork +=
+                new DoWorkEventHandler(BackgroundWorker1_DoWorkAsync);
+            backgroundWorker1.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            BackgroundWorker1_RunWorkerCompleted);
+        }
+
+
         public Registration()
         {
             InitializeComponent();
+            InitializeBackgroundWorker();
+            backgroundWorker1.WorkerSupportsCancellation = true;
             DeviceList.ItemsSource = null;
             deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
@@ -60,7 +75,79 @@ namespace RobotClient
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
             //Send cancellation token
-            ScanDevicesAsync();
+
+                buttonScan.IsEnabled = false;
+                backgroundWorker1.RunWorkerAsync();
+                
+           
+        }
+
+        private async void BackgroundWorker1_DoWorkAsync(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = (BackgroundWorker)sender;
+            _devicesFound = 0;
+            Dispatcher.Invoke(() =>
+            {
+                LogFieldReg.AppendText("Starting Scan for Devices: \n");
+            });
+
+            
+
+            var tasks = new List<Task>();
+
+            _stopWatch.Start();
+
+            for (var i = 1; i <= 255; i++)
+            {
+                if (backgroundWorker1.CancellationPending)
+                { break; }
+
+                _scanningIp = _defaultGateway + i;
+                var p = new Ping();
+                var response = await p.SendPingAsync(_scanningIp, timeout);
+
+                if (response.Status == IPStatus.Success)
+                {
+                    string deviceName;
+                    try
+                    {
+                        deviceName = Dns.GetHostEntry(_scanningIp).HostName;
+                    }
+                    catch (SocketException eS)
+                    {
+                        deviceName = "Unknown Device at " + _scanningIp;
+                        Console.WriteLine(eS);
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+
+
+                        LogFieldReg.AppendText(deviceName + " at " + _scanningIp + "\n");
+                        deviceStringList.Add(new[] { deviceName, _scanningIp, "Default" });
+                        DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
+                        lock (_lockObj)
+                        {
+                            _devicesFound++;
+                        }
+                    });
+                }
+            }
+
+            await Task.WhenAll(tasks).ContinueWith(t =>
+            {
+                _stopWatch.Stop();
+                _ts = _stopWatch.Elapsed;
+                MessageBox.Show(_devicesFound.ToString() + " local devices found. Scan time: " + _ts.ToString(), "Asynchronous");
+            });
+
+        }
+
+
+        private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+            buttonScan.IsEnabled = true;
         }
 
         /**
@@ -68,13 +155,14 @@ namespace RobotClient
          */
         private void ButtonScanCancel(object sender, RoutedEventArgs e)
         {
-            //TODO
-            /* while (tasks.Any())
-             {
-                 tasks[0].Dispose();
-                 tasks.RemoveAt(0);
-             }
-             LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");*/
+
+            backgroundWorker1.CancelAsync();
+            buttonScan.IsEnabled = true;
+            Dispatcher.Invoke(() =>
+            {
+                LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");
+                });
+
         }
 
         /**
@@ -92,7 +180,7 @@ namespace RobotClient
             for (var i = 1; i <= 255; i++)
             {
                 _scanningIp = _defaultGateway + i;
-
+                Console.WriteLine(_scanningIp);
                 var p = new Ping();
                 var task = AsyncUpdate(p, _scanningIp);
                 tasks.Add(task);
