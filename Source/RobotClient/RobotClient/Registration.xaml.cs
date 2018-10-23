@@ -80,12 +80,13 @@ namespace RobotClient
          */
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
-            //Send cancellation token
-
-                buttonScan.IsEnabled = false;
-                backgroundWorker1.RunWorkerAsync();
-                
-           
+            deviceStringList.Clear();
+            deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
+            DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
+            backgroundWorker1.RunWorkerAsync();
         }
 
         private async void BackgroundWorker1_DoWorkAsync(object sender, DoWorkEventArgs e)
@@ -95,6 +96,7 @@ namespace RobotClient
             Dispatcher.Invoke(() =>
             {
                 LogFieldReg.AppendText("Starting Scan for Devices: \n");
+                buttonScan.IsEnabled = false;
             });
 
             
@@ -105,8 +107,7 @@ namespace RobotClient
 
             for (var i = 1; i <= 255; i++)
             {
-                if (backgroundWorker1.CancellationPending)
-                { break; }
+
 
                 _scanningIp = _defaultGateway + i;
                 var p = new Ping();
@@ -138,13 +139,26 @@ namespace RobotClient
                         }
                     });
                 }
+                if (backgroundWorker1.CancellationPending)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");
+                    });
+                    break; }
             }
 
             await Task.WhenAll(tasks).ContinueWith(t =>
             {
                 _stopWatch.Stop();
                 _ts = _stopWatch.Elapsed;
+                
                 MessageBox.Show(_devicesFound.ToString() + " local devices found. Scan time: " + _ts.ToString(), "Asynchronous");
+            });
+
+            Dispatcher.Invoke(() =>
+            {
+                buttonScan.IsEnabled = true;
             });
 
         }
@@ -153,81 +167,13 @@ namespace RobotClient
         private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
-            buttonScan.IsEnabled = true;
+            
         }
 
         /**
          *
          */
-        private void ButtonScanCancel(object sender, RoutedEventArgs e)
-        {
-
-            backgroundWorker1.CancelAsync();
-            buttonScan.IsEnabled = true;
-            Dispatcher.Invoke(() =>
-            {
-                LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");
-                });
-
-        }
-
-        /**
-         *
-         */
-        public async void ScanDevicesAsync()
-        {
-            _devicesFound = 0;
-            LogFieldReg.AppendText("Starting Scan for Devices: \n");
-
-            var tasks = new List<Task>();
-
-            _stopWatch.Start();
-
-            for (var i = 1; i <= 255; i++)
-            {
-                _scanningIp = _defaultGateway + i;
-                Console.WriteLine(_scanningIp);
-                var p = new Ping();
-                var task = AsyncUpdate(p, _scanningIp);
-                tasks.Add(task);
-            }
-
-            await Task.WhenAll(tasks).ContinueWith(t =>
-            {
-                _stopWatch.Stop();
-                _ts = _stopWatch.Elapsed;
-                MessageBox.Show(_devicesFound.ToString() + " local devices found. Scan time: " + _ts.ToString(), "Asynchronous");
-            });
-        }
-
-        /**
-         *
-         */
-        private async Task AsyncUpdate(Ping ping, string ip)
-        {
-            var response = await ping.SendPingAsync(ip, timeout);
-
-            if (response.Status == IPStatus.Success)
-            {
-                string deviceName;
-                try
-                {
-                    deviceName = Dns.GetHostEntry(ip).HostName;
-                }
-                catch (SocketException e)
-                {
-                    deviceName = "Unknown Device at " + ip;
-                    Console.WriteLine(e);
-                }
-                LogFieldReg.AppendText(deviceName + " at " + ip + "\n");
-                deviceStringList.Add(new[] { deviceName, ip, "Default" });
-                DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
-                lock (_lockObj)
-                {
-                    _devicesFound++;
-                }
-            }
-        }
+        private void ButtonScanCancel(object sender, RoutedEventArgs e) => backgroundWorker1.CancelAsync();
 
         /**
          *
