@@ -24,8 +24,8 @@ namespace RobotClient
         private Controller _controller;
         private DispatcherTimer _timer = new DispatcherTimer();
         private readonly int _deadzoneValue = 2500;
-        private double _motor1Controller;
-        private double _motor2Controller;
+        private double _directionController;
+        private double _throttleController;
         private Gamepad _previousState;
 
         /**
@@ -55,8 +55,8 @@ namespace RobotClient
                 _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
                 _timer.Tick += _timer_Tick;
                 _timer.Start();
-                _motor1Controller = 0.0;
-                _motor2Controller = 0.0;
+                _directionController = 0.0;
+                _throttleController = 0.0;
             }
         }
 
@@ -116,10 +116,10 @@ namespace RobotClient
                 return;
 
             //_Motor1 produces either -1.0 for left or 1.0 for right motion
-            _motor1Controller = Math.Abs((double)state.LeftThumbX) < _deadzoneValue
+            _directionController = Math.Abs((double)state.LeftThumbX) < _deadzoneValue
                 ? 0
                 : (double)state.LeftThumbX / short.MinValue * -1;
-            _motor1Controller = Math.Round(_motor1Controller, 3);
+            _directionController = Math.Round(_directionController, 3);
 
             /**
              * These variables produce either 1.0 for forward motion, or -1 for backwards.
@@ -130,15 +130,18 @@ namespace RobotClient
 
 
             if (forwardSpeed > 0 && backwardSpeed == 0)
-                _motor2Controller = forwardSpeed;
+                _throttleController = forwardSpeed;
             else if (backwardSpeed < 0 && forwardSpeed == 0)
-                _motor2Controller = backwardSpeed;
+                _throttleController = backwardSpeed;
             else
-                _motor2Controller = 0.0;
+                _throttleController = 0.0;
 
-            LogField.AppendText(DateTime.Now + ":\tMotor 1: " + _motor1Controller + "\tMotor 2: " + _motor2Controller + "\n");
+            string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
+            string[] directionStrings = { "and left", "", "and right" };
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)_throttleController + 1] + " " +
+                                directionStrings[(int)_directionController + 1] + "\n");
             LogField.ScrollToEnd();
-            picar.SetMotion(_motor1Controller, _motor2Controller);
+            picar.SetMotion(_throttleController,_directionController);
             _previousState = state;
         }
 
@@ -151,24 +154,24 @@ namespace RobotClient
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             if (e.IsRepeat) return;
 
-            var motorOne = 0.0;
-            var motorTwo = 0.0;
+            var directionMotor = 0.0;
+            var throttleMotor = 0.0;
 
-            string[] motorTwoDir = { "Moving backwards", "In Neutral", "Moving forwards" };
-            string[] motorOneDir = { "and left", "", "and right" };
+            string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
+            string[] directionStrings = { "and left", "", "and right" };
 
 
-            if (Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.Up)) motorTwo++;
+            if (Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.Up)) throttleMotor++;
 
-            if (Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.Down)) motorTwo--;
+            if (Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.Down)) throttleMotor--;
 
-            if (Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.Left)) motorOne--;
+            if (Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.Left)) directionMotor--;
 
-            if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.Right)) motorOne++;
+            if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.Right)) directionMotor++;
 
-            LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " +
-                                motorOneDir[(int)motorOne + 1] + "\n");
-            picar.SetMotion(motorOne, motorTwo);
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)throttleMotor + 1] + " " +
+                                directionStrings[(int)directionMotor + 1] + "\n");
+            picar.SetMotion(throttleMotor, directionMotor);
             LogField.ScrollToEnd();
         }
 
@@ -180,23 +183,23 @@ namespace RobotClient
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
 
-            var motorOne = 0.0;
-            var motorTwo = 0.0;
+            var directionMotor = 0.0;
+            var throttleMotor = 0.0;
 
-            string[] motorTwoDir = { "Now Moving backwards", "Now In Neutral", "Now Moving forwards" };
-            string[] motorOneDir = { "and left", "", "and right" };
+            string[] throttleStrings = { "Now Moving backwards", "Now In Neutral", "Now Moving forwards" };
+            string[] directionString = { "and left", "", "and right" };
 
-            if (Keyboard.IsKeyUp(Key.W) && Keyboard.IsKeyUp(Key.Up)) motorTwo--;
+            if (Keyboard.IsKeyUp(Key.W) && Keyboard.IsKeyUp(Key.Up)) throttleMotor--;
 
-            if (Keyboard.IsKeyUp(Key.S) && Keyboard.IsKeyUp(Key.Down)) motorTwo++;
+            if (Keyboard.IsKeyUp(Key.S) && Keyboard.IsKeyUp(Key.Down)) throttleMotor++;
 
-            if (Keyboard.IsKeyUp(Key.A) && Keyboard.IsKeyUp(Key.Left)) motorOne++;
+            if (Keyboard.IsKeyUp(Key.A) && Keyboard.IsKeyUp(Key.Left)) directionMotor++;
 
-            if (Keyboard.IsKeyUp(Key.D) && Keyboard.IsKeyUp(Key.Right)) motorOne--;
+            if (Keyboard.IsKeyUp(Key.D) && Keyboard.IsKeyUp(Key.Right)) directionMotor--;
 
-            LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " +
-                                motorOneDir[(int)motorOne + 1] + "\n");
-            picar.SetMotion(motorOne, motorTwo);
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)throttleMotor + 1] + " " +
+                                directionString[(int)directionMotor + 1] + "\n");
+            picar.SetMotion(throttleMotor, directionMotor);
             LogField.ScrollToEnd();
         }
 

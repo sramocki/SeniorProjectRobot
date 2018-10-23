@@ -137,9 +137,6 @@ namespace RobotClient
             Mode = mode;
         }
 
-        public override void SetMotion(double throttle, double direction)
-        {
-            Console.WriteLine(Name + " Moving");
-        }
+        public override void SetMotion(double throttle, double direction){}
     }
 }
