@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -9,6 +10,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Grpc.Core;
+using System.ComponentModel;
+using System.Windows.Forms;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 
 namespace RobotClient
@@ -27,16 +32,32 @@ namespace RobotClient
         static object _lockObj = new object();
         Stopwatch _stopWatch = new Stopwatch();
         TimeSpan _ts;
+        private BackgroundWorker backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
 
 
         /**
          *
          */
+
+        private void InitializeBackgroundWorker()
+        {
+            backgroundWorker1.DoWork +=
+                new DoWorkEventHandler(BackgroundWorker1_DoWorkAsync);
+            backgroundWorker1.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            BackgroundWorker1_RunWorkerCompleted);
+        }
+
+
         public Registration()
         {
             InitializeComponent();
+            InitializeBackgroundWorker();
+            backgroundWorker1.WorkerSupportsCancellation = true;
             DeviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy", "127.0.0.1", "Default" });
+            deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
 
             //Finds default gateway IP
@@ -59,31 +80,26 @@ namespace RobotClient
          */
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
-            //Send cancellation token
-            ScanDevicesAsync();
+            deviceStringList.Clear();
+            deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
+            DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
+            backgroundWorker1.RunWorkerAsync();
         }
 
-        /**
-         *
-         */
-        private void ButtonScanCancel(object sender, RoutedEventArgs e)
+        private async void BackgroundWorker1_DoWorkAsync(object sender, DoWorkEventArgs e)
         {
-            //TODO
-            /* while (tasks.Any())
-             {
-                 tasks[0].Dispose();
-                 tasks.RemoveAt(0);
-             }
-             LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");*/
-        }
-
-        /**
-         *
-         */
-        public async void ScanDevicesAsync()
-        {
+            BackgroundWorker worker = (BackgroundWorker)sender;
             _devicesFound = 0;
-            LogFieldReg.AppendText("Starting Scan for Devices: \n");
+            Dispatcher.Invoke(() =>
+            {
+                LogFieldReg.AppendText("Starting Scan for Devices: \n");
+                buttonScan.IsEnabled = false;
+            });
+
+            
 
             var tasks = new List<Task>();
 
@@ -91,49 +107,73 @@ namespace RobotClient
 
             for (var i = 1; i <= 255; i++)
             {
-                _scanningIp = _defaultGateway + i;
 
+
+                _scanningIp = _defaultGateway + i;
                 var p = new Ping();
-                var task = AsyncUpdate(p, _scanningIp);
-                tasks.Add(task);
+                var response = await p.SendPingAsync(_scanningIp, timeout);
+
+                if (response.Status == IPStatus.Success)
+                {
+                    string deviceName;
+                    try
+                    {
+                        deviceName = Dns.GetHostEntry(_scanningIp).HostName;
+                    }
+                    catch (SocketException eS)
+                    {
+                        deviceName = "Unknown Device at " + _scanningIp;
+                        Console.WriteLine(eS);
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+
+
+                        LogFieldReg.AppendText(deviceName + " at " + _scanningIp + "\n");
+                        deviceStringList.Add(new[] { deviceName, _scanningIp, "Default" });
+                        DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
+                        lock (_lockObj)
+                        {
+                            _devicesFound++;
+                        }
+                    });
+                }
+                if (backgroundWorker1.CancellationPending)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        LogFieldReg.AppendText(DateTime.Now + ":\t" + "Scan aborted \n");
+                    });
+                    break; }
             }
 
             await Task.WhenAll(tasks).ContinueWith(t =>
             {
                 _stopWatch.Stop();
                 _ts = _stopWatch.Elapsed;
+                
                 MessageBox.Show(_devicesFound.ToString() + " local devices found. Scan time: " + _ts.ToString(), "Asynchronous");
             });
+
+            Dispatcher.Invoke(() =>
+            {
+                buttonScan.IsEnabled = true;
+            });
+
+        }
+
+
+        private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+            
         }
 
         /**
          *
          */
-        private async Task AsyncUpdate(Ping ping, string ip)
-        {
-            var response = await ping.SendPingAsync(ip, timeout);
-
-            if (response.Status == IPStatus.Success)
-            {
-                string deviceName;
-                try
-                {
-                    deviceName = Dns.GetHostEntry(ip).HostName;
-                }
-                catch (SocketException e)
-                {
-                    deviceName = "Unknown Device at " + ip;
-                    Console.WriteLine(e);
-                }
-                LogFieldReg.AppendText(deviceName + " at " + ip + "\n");
-                deviceStringList.Add(new[] { deviceName, ip, "Default" });
-                DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
-                lock (_lockObj)
-                {
-                    _devicesFound++;
-                }
-            }
-        }
+        private void ButtonScanCancel(object sender, RoutedEventArgs e) => backgroundWorker1.CancelAsync();
 
         /**
          *
@@ -162,40 +202,43 @@ namespace RobotClient
             var selectedIP = deviceStringList[index][1];
             var selectedName = deviceStringList[index][0];
 
-            //Handle the dummy connection
-            if (selectedIP == "127.0.0.1" & selectedName == "Dummy")
-            {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded dummy device for testing\n");
-                var dummyConnection = new DummyConnection("Dummy", "127.0.0.1");
-                _mainWindow.deviceListMain.Add(dummyConnection);
-                _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
-                return;
-            }
-
-            //Handle a regular connection
-            var canConnect = false;
+            DummyConnection dummy = null;
             PiCarConnection newConnection = null;
+            var canConnect = false;
 
-            try
+            //Handle the dummy connection
+            if (selectedIP == "N/A")
             {
-                newConnection = new PiCarConnection(selectedName, selectedIP);
-                canConnect = newConnection.requestConnect();
-            }
-            catch (RpcException rpcE)
-            {
-                Console.WriteLine(rpcE);
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded " + selectedName + "for testing\n");
+                var dummyConnection = new DummyConnection(selectedName, selectedIP);
+                _mainWindow.deviceListMain.Add(dummyConnection);
             }
 
-            if (canConnect)
-            {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Connected to " + selectedName + " with IP: " + selectedIP + "\n");
-                _mainWindow.deviceListMain.Add(newConnection);
-                _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
-            }
             else
             {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                try
+                {
+                    newConnection = new PiCarConnection(selectedName, selectedIP);
+                    canConnect = newConnection.RequestConnect();
+                }
+                catch (RpcException rpcE)
+                {
+                    Console.WriteLine(rpcE);
+                }
+
+                if (canConnect)
+                {
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+                    _mainWindow.deviceListMain.Add(newConnection);
+                }
+                else
+                {
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                }
             }
+
+            _mainWindow.DeviceListMn.ItemsSource = null;
+            _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
         }
     }
 }

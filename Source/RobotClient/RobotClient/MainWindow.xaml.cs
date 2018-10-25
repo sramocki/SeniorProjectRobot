@@ -24,8 +24,8 @@ namespace RobotClient
         private Controller _controller;
         private DispatcherTimer _timer = new DispatcherTimer();
         private readonly int _deadzoneValue = 2500;
-        private double _motor1Controller;
-        private double _motor2Controller;
+        private double _directionController;
+        private double _throttleController;
         private Gamepad _previousState;
 
         /**
@@ -55,8 +55,8 @@ namespace RobotClient
                 _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
                 _timer.Tick += _timer_Tick;
                 _timer.Start();
-                _motor1Controller = 0.0;
-                _motor2Controller = 0.0;
+                _directionController = 0.0;
+                _throttleController = 0.0;
             }
         }
 
@@ -89,7 +89,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles importing data written from a locally saved log file, and outputs it into the current log field.
          */
         private void ImportData_Click(object sender, RoutedEventArgs e)
         {
@@ -103,12 +103,12 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles the controller input for variable speed and direction
          */
         private void ControllerMovement()
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var state = _controller.GetState().Gamepad;
             if (state.LeftThumbX.Equals(_previousState.LeftThumbX) &&
                 state.LeftTrigger.Equals(_previousState.LeftTrigger) &&
@@ -116,10 +116,10 @@ namespace RobotClient
                 return;
 
             //_Motor1 produces either -1.0 for left or 1.0 for right motion
-            _motor1Controller = Math.Abs((double)state.LeftThumbX) < _deadzoneValue
+            _directionController = Math.Abs((double)state.LeftThumbX) < _deadzoneValue
                 ? 0
                 : (double)state.LeftThumbX / short.MinValue * -1;
-            _motor1Controller = Math.Round(_motor1Controller, 3);
+            _directionController = Math.Round(_directionController, 3);
 
             /**
              * These variables produce either 1.0 for forward motion, or -1 for backwards.
@@ -130,115 +130,130 @@ namespace RobotClient
 
 
             if (forwardSpeed > 0 && backwardSpeed == 0)
-                _motor2Controller = forwardSpeed;
+                _throttleController = forwardSpeed;
             else if (backwardSpeed < 0 && forwardSpeed == 0)
-                _motor2Controller = backwardSpeed;
+                _throttleController = backwardSpeed;
             else
-                _motor2Controller = 0.0;
+                _throttleController = 0.0;
 
-            LogField.AppendText(DateTime.Now + ":\tMotor 1: " + _motor1Controller + "\tMotor 2: " + _motor2Controller + "\n");
+            string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
+            string[] directionStrings = { "and left", "", "and right" };
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)_throttleController + 1] + " " +
+                                directionStrings[(int)_directionController + 1] + "\n");
             LogField.ScrollToEnd();
-            picar.setMotion(_motor1Controller, _motor2Controller);
+            picar.SetMotion(_throttleController,_directionController);
             _previousState = state;
         }
 
         /**
-         *
+         * Method that handles when one or more key is pressed down (Vehicle is moving in one or more directions)
          */
         private void Key_down(object sender, KeyEventArgs e)
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             if (e.IsRepeat) return;
 
-            var motorOne = 0.0;
-            var motorTwo = 0.0;
+            var directionMotor = 0.0;
+            var throttleMotor = 0.0;
 
-            string[] motorTwoDir = { "Moving backwards", "In Neutral", "Moving forwards" };
-            string[] motorOneDir = { "and left", "", "and right" };
+            string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
+            string[] directionStrings = { "and left", "", "and right" };
 
 
-            if (Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.Up)) motorTwo++;
+            if (Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.Up)) throttleMotor++;
 
-            if (Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.Down)) motorTwo--;
+            if (Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.Down)) throttleMotor--;
 
-            if (Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.Left)) motorOne--;
+            if (Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.Left)) directionMotor--;
 
-            if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.Right)) motorOne++;
+            if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.Right)) directionMotor++;
 
-            LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " +
-                                motorOneDir[(int)motorOne + 1] + "\n");
-            picar.setMotion(motorOne, motorTwo);
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)throttleMotor + 1] + " " +
+                                directionStrings[(int)directionMotor + 1] + "\n");
+            picar.SetMotion(throttleMotor, directionMotor);
             LogField.ScrollToEnd();
         }
 
         /**
-         *
+         * Method that handles when one or more key is released (Vehicle is stopping in one or more directions)
          */
         private void Key_up(object sender, KeyEventArgs e)
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
 
-            var motorOne = 0.0;
-            var motorTwo = 0.0;
+            var directionMotor = 0.0;
+            var throttleMotor = 0.0;
 
-            string[] motorTwoDir = { "Now Moving backwards", "Now In Neutral", "Now Moving forwards" };
-            string[] motorOneDir = { "and left", "", "and right" };
+            string[] throttleStrings = { "Now Moving backwards", "Now In Neutral", "Now Moving forwards" };
+            string[] directionString = { "and left", "", "and right" };
 
-            if (Keyboard.IsKeyUp(Key.W) && Keyboard.IsKeyUp(Key.Up)) motorTwo--;
+            if (Keyboard.IsKeyUp(Key.W) && Keyboard.IsKeyUp(Key.Up)) throttleMotor--;
 
-            if (Keyboard.IsKeyUp(Key.S) && Keyboard.IsKeyUp(Key.Down)) motorTwo++;
+            if (Keyboard.IsKeyUp(Key.S) && Keyboard.IsKeyUp(Key.Down)) throttleMotor++;
 
-            if (Keyboard.IsKeyUp(Key.A) && Keyboard.IsKeyUp(Key.Left)) motorOne++;
+            if (Keyboard.IsKeyUp(Key.A) && Keyboard.IsKeyUp(Key.Left)) directionMotor++;
 
-            if (Keyboard.IsKeyUp(Key.D) && Keyboard.IsKeyUp(Key.Right)) motorOne--;
+            if (Keyboard.IsKeyUp(Key.D) && Keyboard.IsKeyUp(Key.Right)) directionMotor--;
 
-            LogField.AppendText(DateTime.Now + ":\t" + motorTwoDir[(int)motorTwo + 1] + " " +
-                                motorOneDir[(int)motorOne + 1] + "\n");
-            picar.setMotion(motorOne, motorTwo);
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)throttleMotor + 1] + " " +
+                                directionString[(int)directionMotor + 1] + "\n");
+            picar.SetMotion(throttleMotor, directionMotor);
             LogField.ScrollToEnd();
         }
 
         /**
-         *
+         * Method that handles when the GUI buttons are held down (Vehicle is moving a single direction)
          */
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var button = (RepeatButton)sender;
             switch (button.Name)
             {
                 case "Forward":
                     LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
-                    picar.setMotion(1.0, 0.0);
+                    picar.SetMotion(1.0, 0.0);
                     break;
 
                 case "Backwards":
                     LogField.AppendText(DateTime.Now + ":\tMoving backwards\n");
-                    picar.setMotion(-1.0, 0.0);
+                    picar.SetMotion(-1.0, 0.0);
                     break;
 
                 case "Left":
                     LogField.AppendText(DateTime.Now + ":\tMoving left\n");
-                    picar.setMotion(0.0, -1.0);
+                    picar.SetMotion(0.0, -1.0);
                     break;
 
                 case "Right":
                     LogField.AppendText(DateTime.Now + ":\tMoving right\n");
-                    picar.setMotion(0.0, 1.0);
+                    picar.SetMotion(0.0, 1.0);
                     break;
 
                 default:
-                    Console.WriteLine(DateTime.Now + ":\tThis wasn't supposed to happen..");
+                    Console.WriteLine("Mistakes were made");
                     break;
             }
             LogField.ScrollToEnd();
         }
 
         /**
-         *
+         *  Method that handles when the GUI button is released (Vehicle is stopped)
+         */
+        private void ButtonPress_Released(object sender, RoutedEventArgs e)
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            LogField.AppendText(DateTime.Now + ":\tNow In Neutral\n");
+            picar.SetMotion(0.0, 0.0);
+            LogField.ScrollToEnd();
+        }
+
+        /**
+         * Method that opens a message box with 'About' information
          */
         private void About_Click(object sender, RoutedEventArgs e)
         {
@@ -249,10 +264,23 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Method that handles shutdown confirmation
          */
         private void Shutdown_Click(object sender, RoutedEventArgs e)
         {
+            if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) ==
+                MessageBoxResult.Yes)
+
+                Application.Current.Shutdown();
+        }
+
+        /**
+         * Method that handles shutdown confirmation
+         */
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            //TODO add saving confirmation of log data
             if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
                     MessageBoxImage.Question) ==
                 MessageBoxResult.Yes)
@@ -272,7 +300,7 @@ namespace RobotClient
 
             //Update ipBox and deviceStatus with it's info
             IpBox.Text = picar.ipAddress;
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
         }
 
         /**
@@ -286,9 +314,9 @@ namespace RobotClient
             Console.WriteLine("Setting " + picar + "as Leader");
 
             //Send message to picar to change modes
-            picar.setMode(ModeRequest.Types.Mode.Lead);
+            picar.SetMode(ModeRequest.Types.Mode.Lead);
             //Update deviceStatus
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
         }
 
         /**
@@ -302,9 +330,9 @@ namespace RobotClient
             Console.WriteLine("Setting " + picar + "as Follower");
 
             //Send message to picar to change modes
-            picar.setMode(ModeRequest.Types.Mode.Follow);
+            picar.SetMode(ModeRequest.Types.Mode.Follow);
             //Update deviceStatus
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
         }
 
         /**
@@ -318,9 +346,20 @@ namespace RobotClient
             Console.WriteLine("Setting " + picar + "as Idle");
 
             //Send message to picar to change modes
-            picar.setMode(ModeRequest.Types.Mode.Idle);
+            picar.SetMode(ModeRequest.Types.Mode.Idle);
             //Update deviceStatus
-            DeviceStatus.Text = picar.mode.ToString();
+            DeviceStatus.Text = picar.Mode.ToString();
+        }
+
+        private void SelectLeaders_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var t in DeviceListMn.Items)
+            {
+                if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
+                {
+                    DeviceListMn.SelectedItems.Add(temp);
+                }
+            }
         }
 
         #region Properties
