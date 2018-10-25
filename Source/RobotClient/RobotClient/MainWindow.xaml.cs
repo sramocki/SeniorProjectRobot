@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +9,9 @@ using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using SharpDX.XInput;
 using System.IO;
+using System.Threading;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace RobotClient
 {
@@ -17,6 +20,8 @@ namespace RobotClient
         public List<PiCarConnection> deviceListMain = new List<PiCarConnection>();
         public string LeaderIp { set; get; }
         public string FollowerIP { set; get; }
+
+        private readonly SynchronizationContext synchronizationContext;
 
         private string _leftAxis;
         private string _rightAxis;
@@ -34,6 +39,10 @@ namespace RobotClient
         public MainWindow()
         {
             InitializeComponent();
+
+            //Setup sync context
+            synchronizationContext = SynchronizationContext.Current;
+            
             LeaderIp = "Empty";
             Title = "Welcome " + Environment.UserName;
 
@@ -59,6 +68,18 @@ namespace RobotClient
                 _throttleController = 0.0;
             }
         }
+
+        /**
+         * Image update method to update video stream image asynchronously
+         */
+        public void UpdateStream(ImageSource image)
+        {
+            synchronizationContext.Post(new SendOrPostCallback(o =>
+            {
+                StreamImage.Source = (ImageSource)o;
+            }), image);
+        }
+        
 
         /**
          * Timer method that calls the method that checks the controller status
@@ -291,12 +312,29 @@ namespace RobotClient
         /**
          *
          */
-        private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
+            //Stop the stream of the previously selected event
+            foreach (PiCarConnection oldPicar in e.RemovedItems)
+            {
+
+                oldPicar.StopStream();
+            }
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
+
             Console.WriteLine("Selected " + picar);
+
+            var streamTask = picar.StartStream();
+            try { 
+                await streamTask;
+            }
+            catch (NullReferenceException nre)
+            {
+                Console.WriteLine("Exception??? " + nre);
+            }
 
             //Update ipBox and deviceStatus with it's info
             IpBox.Text = picar.ipAddress;

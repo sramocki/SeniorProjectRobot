@@ -28,7 +28,7 @@
         <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="430,436,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" FontSize="24" Height="39"/>
         <MediaElement Margin="297,116,259,409" OpacityMask="#FFFD1313" Grid.ColumnSpan="2" Grid.Column="0"></MediaElement>
         <Rectangle Fill="#FFD0D0EC" Margin="298,117,259,409" Stroke="Black" Grid.ColumnSpan="2" Grid.Column="0" />
-        <ListBox Grid.Column="0" Name="DeviceListMn"  HorizontalAlignment="Left" Height="291" Margin="24,107,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Multiple"/>
+        <ListBox Grid.Column="0" Name="DeviceListMn"  HorizontalAlignment="Left" Height="291" Margin="24,107,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Single"/>
         <TextBox IsReadOnly="True" Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="51,453,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center"/>
         <TextBox IsReadOnly="True" Name="DeviceStatus" HorizontalAlignment="Left" Height="24" Margin="614,413,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" TextAlignment="Center" RenderTransformOrigin="2.528,2.5"/>
         <Button Content="Set Leader" Click="SetLeader" HorizontalAlignment="Left" Margin="642,264,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
@@ -38,5 +38,6 @@
         <Label Content="Selected IP " HorizontalAlignment="Left" Margin="75,419,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.38,-1.192"/>
         <Label Content="Status" HorizontalAlignment="Left" Margin="661,379,0,0" VerticalAlignment="Top"/>
         <Button Content="Select Leaders" HorizontalAlignment="Left" Margin="66,39,0,0" VerticalAlignment="Top" Width="95" Height="26" Click="SelectLeaders_Click"/>
+        <Image Name="StreamImage" HorizontalAlignment="Left" Height="245" Margin="298,117,0,0" VerticalAlignment="Top" Width="237"/>
     </Grid>
 </Window>
