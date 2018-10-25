@@ -6,6 +6,9 @@ import time
 import picarserver
 import picarhelper
 import socket
+import grpc
+import picar_pb2
+import picar_pb2_grpc
 
 picar.setup()
 rear_wheels_enabled = True
@@ -20,7 +23,7 @@ FW_ANGLE_MIN = fw_default-30
 #fw.offset = 0
 #fw.turn(fw_default)
 
-mode = 'IDLE'
+mode = 0
 
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
@@ -31,7 +34,8 @@ inputMode = False
 def main():
 
     #start the server
-    picarserver.serve()
+    server = picarserver.getServer()
+    server.start()
 
     print "Server Started on "+socket.gethostname()+"\n"
     print "Press Ctrl-C to quit"
@@ -50,27 +54,27 @@ def main():
         # get reference to current mode
         mode = picarserver.mode
 
-        if mode == 'LEADER':
+        if mode == 1:
             # leader mode
             #print "picar set to LEADER"
             move(picarserver.throttle, picarserver.direction)
 
-        elif mode == 'FOLLOWER':
+        # elif mode == 2:
             # follower mode
-            print "picar set to FOLLOWER"
+            #print "picar set to FOLLOWER"
              
-        else:
+        # else:
             # idle mode
-            print "picar set to IDLE"
+            #print "picar set to IDLE"
         
         #wait 1 second after loop    
-        time.sleep(1)
+        time.sleep(1/60)
     #cleanup    
     destroy()
 
 def move(throttle, direction):
     motor_speed = abs(throttle)*100
-    fw_angle = fw_default-(30*(direction))
+    fw_angle = fw_default+(30*(direction))
 
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
