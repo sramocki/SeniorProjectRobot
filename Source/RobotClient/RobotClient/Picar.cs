@@ -30,13 +30,19 @@ namespace RobotClient {
             "KA4yJC5TZW5pb3JQcm9qZWN0Um9ib3QuTW9kZVJlcXVlc3QuTW9kZSImCgRN",
             "b2RlEggKBElETEUQABIICgRMRUFEEAESCgoGRk9MTE9XEAIiGgoHTW9kZUFj",
             "axIPCgdzdWNjZXNzGAEgASgIIjAKCVNldE1vdGlvbhIQCgh0aHJvdHRsZRgB",
-            "IAEoARIRCglkaXJlY3Rpb24YAiABKAEy/QEKBVBpQ2FyElkKEVJlY2VpdmVD",
-            "b25uZWN0aW9uEiIuU2VuaW9yUHJvamVjdFJvYm90LkNvbm5lY3RSZXF1ZXN0",
-            "Gh4uU2VuaW9yUHJvamVjdFJvYm90LkNvbm5lY3RBY2siABJMCgpTd2l0Y2hN",
-            "b2RlEh8uU2VuaW9yUHJvamVjdFJvYm90Lk1vZGVSZXF1ZXN0GhsuU2VuaW9y",
-            "UHJvamVjdFJvYm90Lk1vZGVBY2siABJLCg1SZW1vdGVDb250cm9sEh0uU2Vu",
-            "aW9yUHJvamVjdFJvYm90LlNldE1vdGlvbhoZLlNlbmlvclByb2plY3RSb2Jv",
-            "dC5FbXB0eSIAQg6qAgtSb2JvdENsaWVudGIGcHJvdG8z"));
+            "IAEoARIRCglkaXJlY3Rpb24YAiABKAEiEgoQU3RhcnRWaWRlb1N0cmVhbSId",
+            "CgxJbWFnZUNhcHR1cmUSDQoFaW1hZ2UYASABKAwiEAoORW5kVmlkZW9TdHJl",
+            "YW0ypwMKBVBpQ2FyElkKEVJlY2VpdmVDb25uZWN0aW9uEiIuU2VuaW9yUHJv",
+            "amVjdFJvYm90LkNvbm5lY3RSZXF1ZXN0Gh4uU2VuaW9yUHJvamVjdFJvYm90",
+            "LkNvbm5lY3RBY2siABJMCgpTd2l0Y2hNb2RlEh8uU2VuaW9yUHJvamVjdFJv",
+            "Ym90Lk1vZGVSZXF1ZXN0GhsuU2VuaW9yUHJvamVjdFJvYm90Lk1vZGVBY2si",
+            "ABJLCg1SZW1vdGVDb250cm9sEh0uU2VuaW9yUHJvamVjdFJvYm90LlNldE1v",
+            "dGlvbhoZLlNlbmlvclByb2plY3RSb2JvdC5FbXB0eSIAElkKC1ZpZGVvU3Ry",
+            "ZWFtEiQuU2VuaW9yUHJvamVjdFJvYm90LlN0YXJ0VmlkZW9TdHJlYW0aIC5T",
+            "ZW5pb3JQcm9qZWN0Um9ib3QuSW1hZ2VDYXB0dXJlIgAwARJNCgpTdG9wU3Ry",
+            "ZWFtEiIuU2VuaW9yUHJvamVjdFJvYm90LkVuZFZpZGVvU3RyZWFtGhkuU2Vu",
+            "aW9yUHJvamVjdFJvYm90LkVtcHR5IgBCDqoCC1JvYm90Q2xpZW50YgZwcm90",
+            "bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
@@ -45,7 +51,10 @@ namespace RobotClient {
             new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.ConnectAck), global::RobotClient.ConnectAck.Parser, new[]{ "Success" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.ModeRequest), global::RobotClient.ModeRequest.Parser, new[]{ "Mode" }, null, new[]{ typeof(global::RobotClient.ModeRequest.Types.Mode) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.ModeAck), global::RobotClient.ModeAck.Parser, new[]{ "Success" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.SetMotion), global::RobotClient.SetMotion.Parser, new[]{ "Throttle", "Direction" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.SetMotion), global::RobotClient.SetMotion.Parser, new[]{ "Throttle", "Direction" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.StartVideoStream), global::RobotClient.StartVideoStream.Parser, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.ImageCapture), global::RobotClient.ImageCapture.Parser, new[]{ "Image" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RobotClient.EndVideoStream), global::RobotClient.EndVideoStream.Parser, null, null, null, null)
           }));
     }
     #endregion
@@ -871,6 +880,346 @@ namespace RobotClient {
             Direction = input.ReadDouble();
             break;
           }
+        }
+      }
+    }
+
+  }
+
+  /// <summary>
+  ///Message to indicate to begin streaming video
+  /// </summary>
+  public sealed partial class StartVideoStream : pb::IMessage<StartVideoStream> {
+    private static readonly pb::MessageParser<StartVideoStream> _parser = new pb::MessageParser<StartVideoStream>(() => new StartVideoStream());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<StartVideoStream> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RobotClient.PicarReflection.Descriptor.MessageTypes[6]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public StartVideoStream() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public StartVideoStream(StartVideoStream other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public StartVideoStream Clone() {
+      return new StartVideoStream(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as StartVideoStream);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(StartVideoStream other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(StartVideoStream other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class ImageCapture : pb::IMessage<ImageCapture> {
+    private static readonly pb::MessageParser<ImageCapture> _parser = new pb::MessageParser<ImageCapture>(() => new ImageCapture());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<ImageCapture> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RobotClient.PicarReflection.Descriptor.MessageTypes[7]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ImageCapture() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ImageCapture(ImageCapture other) : this() {
+      image_ = other.image_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ImageCapture Clone() {
+      return new ImageCapture(this);
+    }
+
+    /// <summary>Field number for the "image" field.</summary>
+    public const int ImageFieldNumber = 1;
+    private pb::ByteString image_ = pb::ByteString.Empty;
+    /// <summary>
+    ///A bytestring containing the image data
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pb::ByteString Image {
+      get { return image_; }
+      set {
+        image_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as ImageCapture);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(ImageCapture other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Image != other.Image) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Image.Length != 0) hash ^= Image.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Image.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteBytes(Image);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Image.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Image);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(ImageCapture other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Image.Length != 0) {
+        Image = other.Image;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Image = input.ReadBytes();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  /// <summary>
+  ///Message to indiciate to stop streaming video
+  /// </summary>
+  public sealed partial class EndVideoStream : pb::IMessage<EndVideoStream> {
+    private static readonly pb::MessageParser<EndVideoStream> _parser = new pb::MessageParser<EndVideoStream>(() => new EndVideoStream());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<EndVideoStream> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RobotClient.PicarReflection.Descriptor.MessageTypes[8]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public EndVideoStream() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public EndVideoStream(EndVideoStream other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public EndVideoStream Clone() {
+      return new EndVideoStream(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as EndVideoStream);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(EndVideoStream other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(EndVideoStream other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
         }
       }
     }
