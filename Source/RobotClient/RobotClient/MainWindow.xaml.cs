@@ -21,9 +21,8 @@ namespace RobotClient
         private string _leftAxis;
         private string _rightAxis;
         private string _buttons;
-        private Controller _controller;
-        private DispatcherTimer _timer = new DispatcherTimer();
-        private readonly int _deadzoneValue = 2500;
+        private readonly Controller _controller;
+        private const int DeadzoneValue = 2500;
         private double _directionController;
         private double _throttleController;
         private Gamepad _previousState;
@@ -46,15 +45,15 @@ namespace RobotClient
             _controller = new Controller(UserIndex.One);
             if (!_controller.IsConnected)
             {
-                LogField.AppendText(DateTime.Now + ":\tNo controller found\n");
+                LogField.AppendText(DateTime.Now + ":\tNo controller found!\n");
             }
             else
             {
                 //Uses a timer to loop a method that checks the status of the controller
-                LogField.AppendText(DateTime.Now + ":\tController detected\n");
-                _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
-                _timer.Tick += _timer_Tick;
-                _timer.Start();
+                LogField.AppendText(DateTime.Now + ":\tController detected!\n");
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+                timer.Tick += _timer_Tick;
+                timer.Start();
                 _directionController = 0.0;
                 _throttleController = 0.0;
             }
@@ -116,7 +115,7 @@ namespace RobotClient
                 return;
 
             //_Motor1 produces either -1.0 for left or 1.0 for right motion
-            _directionController = Math.Abs((double)state.LeftThumbX) < _deadzoneValue
+            _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
                 ? 0
                 : (double)state.LeftThumbX / short.MinValue * -1;
             _directionController = Math.Round(_directionController, 3);
