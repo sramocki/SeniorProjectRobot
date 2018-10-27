@@ -27,7 +27,7 @@
                 Grid.Column="0" />
         <TextBox IsReadOnly="True" Name="SelectedIpBox" HorizontalAlignment="Left" Height="23" Margin="78,314,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="137" RenderTransformOrigin="0.121,0.121" Grid.ColumnSpan="2"
                  Grid.Column="0" TextAlignment="Center"/>
-        <Button Name ="Cancel" Content="Cancel" Click="ButtonScanCancel" HorizontalAlignment="Left" Margin="0,66,0,0" VerticalAlignment="Top" Width="294" Height="20" Grid.ColumnSpan="2"
+        <Button x:Name ="CancelButton" Content="Cancel" Click="ButtonScanCancel" HorizontalAlignment="Left" Margin="0,66,0,0" VerticalAlignment="Top" Width="294" Height="20" Grid.ColumnSpan="2"
                 Grid.Column="0" />
         <TextBox IsReadOnly="True" Name ="LogFieldReg" Margin="10,413,10,26" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" FontSize="10" Grid.ColumnSpan="2"
                  Grid.Column="0" />
