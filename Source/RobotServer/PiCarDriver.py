@@ -6,6 +6,10 @@ import time
 import picarserver
 import picarhelper
 import socket
+import grpc
+import picar_pb2
+import picar_pb2_grpc
+
 
 picar.setup()
 rear_wheels_enabled = True
@@ -15,13 +19,17 @@ FW_ANGLE_MAX = 90+30
 FW_ANGLE_MIN = 90-30
 
 fw = front_wheels.Front_Wheels()
+fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 
-fw.offset = 0
-fw.turn(90)
+FW_ANGLE_MAX = fw_default+30
+FW_ANGLE_MIN = fw_default-30
 
-mode = 'IDLE'
-throttle = 0
-direction = 0
+
+#fw.offset = 0
+#fw.turn(fw_default)
+
+mode = 0
+
 
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
@@ -32,41 +40,53 @@ inputMode = False
 def main():
 
     #start the server
-    picarserver.serve()
+
+    server = picarserver.getServer()
+    server.start()
 
     print "Server Started on "+socket.gethostname()+"\n"
-    print "Press q to cancel"
+    print "Press Ctrl-C to quit"
+
+    move(0.0,0.0)
 
     # loop unless break occurs
     while True:
 
         #check if key pressed
-        k = cv.waitKey(1) & 0xFF
+
+        k = cv2.waitKey(1) & 0xFF
 
         #if q key is pressed we break loop
         if k == ord('q'):
             break
 
         # get reference to current mode
-        global mode = picarserver.mode
+        mode = picarserver.mode
 
-        if mode == 'LEADER':
+        if mode == 1:
             # leader mode
+            #print "picar set to LEADER"
             move(picarserver.throttle, picarserver.direction)
 
-        elif mode == 'FOLLOWER':
+        # elif mode == 2:
             # follower mode
+            #print "picar set to FOLLOWER"
              
-        else:
+        # else:
             # idle mode
+            #print "picar set to IDLE"
+        
+        #wait 1 second after loop    
+        time.sleep(1/60)
 
     #cleanup    
     destroy()
 
 def move(throttle, direction):
     motor_speed = abs(throttle)*100
+    fw_angle = fw_default+(30*(direction))
 
-    fw_angle = 90-30*(direction)
+
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
     if rear_wheels_enabled:
@@ -84,10 +104,14 @@ def destroy():
 
 def test():
     print "Begin Test!"
-    move(0.5, 0.0)
+
+    move(0.0,0.0)
     time.sleep(1)
-    move(-0.5, 0.0)
+    move(0.0, 1.0)
     time.sleep(1)
+    move(0.0, -1.0)
+    time.sleep(1)
+    move(0.0,0.0)
     print "End Test!"
     destroy()
 

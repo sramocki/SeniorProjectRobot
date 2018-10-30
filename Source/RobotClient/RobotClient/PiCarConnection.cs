@@ -13,6 +13,7 @@ namespace RobotClient
         private class PiCarClient
         {
             private readonly PiCar.PiCarClient _client;
+
             private readonly MainWindow _mainWindow = (MainWindow)Application.Current.MainWindow;
 
             public PiCarClient(PiCar.PiCarClient client)

@@ -161,6 +161,7 @@ namespace RobotClient
             LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)_throttleController + 1] + " " +
                                 directionStrings[(int)_directionController + 1] + "\n");
             LogField.ScrollToEnd();
+
             picar.SetMotion(_throttleController,_directionController);
             _previousState = state;
         }
@@ -228,6 +229,7 @@ namespace RobotClient
          */
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
+            //TODO add button up event for stop command
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var button = (RepeatButton)sender;

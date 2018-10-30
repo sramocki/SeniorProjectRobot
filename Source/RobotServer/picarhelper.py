@@ -1,6 +1,7 @@
 from picar import front_wheels, back_wheels
 
-bw = back_wheels.Back_Wheels
+bw = back_wheels.Back_Wheels()
+
 
 def move_forward(speed):
     bw.speed = speed
@@ -12,3 +13,13 @@ def move_backward(speed):
 
 def stop():
     bw.stop()
+
+def getDefaultAngle(hostname):
+    if hostname == 'picarA':
+        return 95
+    elif hostname == 'picarB':
+        return 90
+
+"""
+Wheel angle above 90 is to the right, below 90 is to the left
+"""
