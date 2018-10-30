@@ -74,7 +74,6 @@ namespace RobotClient
             //Start getting the video stream
             public async Task StartStream()
             {
-                Console.WriteLine("Entered StartStream");
                 try
                 {
                     StartVideoStream request = new StartVideoStream();
@@ -85,11 +84,11 @@ namespace RobotClient
 
                         while (await responseStream.MoveNext())
                         {
+                            //Get a Byte[] array from the message
                             var imageBytes = responseStream.Current.Image.ToByteArray();
+                            //Convert it to ImageSource type
                             var img = (ImageSource)new ImageSourceConverter().ConvertFrom(imageBytes);
-                            
 
-                            Console.WriteLine("Received frame");
                             //Call update UI
                             _mainWindow.UpdateStream(img);
                         }
