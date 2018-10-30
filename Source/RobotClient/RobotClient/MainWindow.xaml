@@ -6,10 +6,11 @@
         KeyDown="Key_down"
         KeyUp="Key_up"
         mc:Ignorable="d"
+        Closing="Window_Closing"
         Title="Robot Client" Height="800" Width="800" ResizeMode="NoResize">
     <Grid>
 
-        <TextBox Name ="LogField" Margin="50,527,53,67" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2"/>
+        <TextBox IsReadOnly="True" Name ="LogField" Margin="50,527,53,67" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2"/>
         <Menu Margin="0,0,0,740" VerticalAlignment="Center" Grid.ColumnSpan="2" Height="31">
             <MenuItem Header="_File">
                 <MenuItem Header="_Register Vehicles" InputGestureText="Ctrl + R" Click="Register_Click" />
@@ -21,15 +22,15 @@
                 <MenuItem Header="_About" Click="About_Click" />
             </MenuItem>
         </Menu>
-        <RepeatButton x:Name="Forward" Click="ButtonPress_Event" Content="↑" HorizontalAlignment="Left" Margin="386,397,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
-        <RepeatButton x:Name="Backwards" Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="386,475,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
-        <RepeatButton x:Name="Left" Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="342,436,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
-        <RepeatButton x:Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="430,436,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" FontSize="24" Height="39"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Forward" Click="ButtonPress_Event" Content="↑" HorizontalAlignment="Left" Margin="386,414,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Backwards" Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="386,453,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Left" Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="342,453,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="430,453,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" FontSize="24" Height="39"/>
         <MediaElement Margin="297,116,259,409" OpacityMask="#FFFD1313" Grid.ColumnSpan="2" Grid.Column="0"></MediaElement>
         <Rectangle Fill="#FFD0D0EC" Margin="298,117,259,409" Stroke="Black" Grid.ColumnSpan="2" Grid.Column="0" />
-        <ListBox Grid.Column="0" Name="DeviceListMn"  HorizontalAlignment="Left" Height="291" Margin="24,107,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Multiple"/>
-        <TextBox Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="51,453,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center"/>
-        <TextBox Name="DeviceStatus" HorizontalAlignment="Left" Height="24" Margin="614,413,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" TextAlignment="Center" RenderTransformOrigin="2.528,2.5"/>
+        <ListBox Grid.Column="0" Name="DeviceListMn"  HorizontalAlignment="Left" Height="291" Margin="24,107,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Single"/>
+        <TextBox IsReadOnly="True" Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="51,453,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center"/>
+        <TextBox IsReadOnly="True" Name="DeviceStatus" HorizontalAlignment="Left" Height="24" Margin="614,413,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" TextAlignment="Center" RenderTransformOrigin="2.528,2.5"/>
         <Button Content="Set Leader" Click="SetLeader" HorizontalAlignment="Left" Margin="642,264,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
         <Button Content="Set Follower" Click="SetFollower" HorizontalAlignment="Left" Margin="642,346,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
         <Button Content="Set Idle" Click="SetDefault" HorizontalAlignment="Left" Margin="642,305,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
@@ -37,5 +38,6 @@
         <Label Content="Selected IP " HorizontalAlignment="Left" Margin="75,419,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.38,-1.192"/>
         <Label Content="Status" HorizontalAlignment="Left" Margin="661,379,0,0" VerticalAlignment="Top"/>
         <Button Content="Select Leaders" HorizontalAlignment="Left" Margin="66,39,0,0" VerticalAlignment="Top" Width="95" Height="26" Click="SelectLeaders_Click"/>
+        <Image Name="StreamImage" HorizontalAlignment="Left" Height="245" Margin="298,117,0,0" VerticalAlignment="Top" Width="237"/>
     </Grid>
 </Window>

@@ -10,9 +10,13 @@ import grpc
 import picar_pb2
 import picar_pb2_grpc
 
+
 picar.setup()
 rear_wheels_enabled = True
 front_wheels_enabled = True
+
+FW_ANGLE_MAX = 90+30
+FW_ANGLE_MIN = 90-30
 
 fw = front_wheels.Front_Wheels()
 fw_default = picarhelper.getDefaultAngle(socket.gethostname())
@@ -20,10 +24,12 @@ fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 FW_ANGLE_MAX = fw_default+30
 FW_ANGLE_MIN = fw_default-30
 
+
 #fw.offset = 0
 #fw.turn(fw_default)
 
 mode = 0
+
 
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
@@ -34,6 +40,7 @@ inputMode = False
 def main():
 
     #start the server
+
     server = picarserver.getServer()
     server.start()
 
@@ -41,10 +48,12 @@ def main():
     print "Press Ctrl-C to quit"
 
     move(0.0,0.0)
+
     # loop unless break occurs
     while True:
 
         #check if key pressed
+
         k = cv2.waitKey(1) & 0xFF
 
         #if q key is pressed we break loop
@@ -69,12 +78,14 @@ def main():
         
         #wait 1 second after loop    
         time.sleep(1/60)
+
     #cleanup    
     destroy()
 
 def move(throttle, direction):
     motor_speed = abs(throttle)*100
     fw_angle = fw_default+(30*(direction))
+
 
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
@@ -93,6 +104,7 @@ def destroy():
 
 def test():
     print "Begin Test!"
+
     move(0.0,0.0)
     time.sleep(1)
     move(0.0, 1.0)

@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
+using System.Windows;
 using Grpc.Core;
+using System.Windows.Media;
 
 namespace RobotClient
 {
@@ -9,6 +13,8 @@ namespace RobotClient
         private class PiCarClient
         {
             private readonly PiCar.PiCarClient _client;
+
+            private readonly MainWindow _mainWindow = (MainWindow)Application.Current.MainWindow;
 
             public PiCarClient(PiCar.PiCarClient client)
             {
@@ -65,6 +71,52 @@ namespace RobotClient
                     throw;
                 }
             }
+
+            //Start getting the video stream
+            public async Task StartStream()
+            {
+                try
+                {
+                    StartVideoStream request = new StartVideoStream();
+
+                    using (var call = _client.VideoStream(request))
+                    {
+                        var responseStream = call.ResponseStream;
+
+                        while (await responseStream.MoveNext())
+                        {
+                            //Get a Byte[] array from the message
+                            var imageBytes = responseStream.Current.Image.ToByteArray();
+                            //Convert it to ImageSource type
+                            var img = (ImageSource)new ImageSourceConverter().ConvertFrom(imageBytes);
+
+                            //Call update UI
+                            _mainWindow.UpdateStream(img);
+                        }
+                    }
+                }
+                catch (RpcException e)
+                {
+                    Console.Write("RPC failed " + e);
+                    throw;
+                }
+            }
+
+            //Stop the video stream
+            public void StopStream()
+            {
+                try
+                {
+                    //Send a control signal to the PiCar
+                    var request = new EndVideoStream();
+                    _client.StopStream(request);
+                }
+                catch (RpcException e)
+                {
+                    Console.Write("RPC failed " + e);
+                    throw;
+                }
+            }
         }
 
         private Channel _channel;
@@ -107,6 +159,16 @@ namespace RobotClient
             _client.SetMotion(throttle, direction);
         }
 
+        public virtual Task StartStream()
+        {
+            return _client.StartStream();
+        }
+
+        public virtual void StopStream()
+        {
+            _client.StopStream(); //End the video stream
+        }
+
         public override string ToString()
         {
             return Name;
@@ -137,9 +199,6 @@ namespace RobotClient
             Mode = mode;
         }
 
-        public override void SetMotion(double throttle, double direction)
-        {
-            Console.WriteLine(Name + " Moving");
-        }
+        public override void SetMotion(double throttle, double direction){}
     }
 }

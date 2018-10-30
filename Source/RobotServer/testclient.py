@@ -36,7 +36,6 @@ def run():
 	stub = picar_pb2_grpc.PiCarStub(grpc.insecure_channel('localhost:50051'))
 	print('Starting stream')
 	startstream(stub)
-	
 		
 if __name__ == '__main__':
 	run()
