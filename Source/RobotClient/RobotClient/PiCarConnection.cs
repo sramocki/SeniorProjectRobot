@@ -199,5 +199,9 @@ namespace RobotClient
         }
 
         public override void SetMotion(double throttle, double direction){}
+
+        public override Task StartStream() { return null;  }
+
+        public override void StopStream() { }
     }
 }
