@@ -204,7 +204,6 @@ namespace RobotClient
                 var dummyConnection = new DummyConnection(selectedName, selectedIP);
                 _mainWindow.deviceListMain.Add(dummyConnection);
             }
-
             else
             {
                 PiCarConnection newConnection = null;
