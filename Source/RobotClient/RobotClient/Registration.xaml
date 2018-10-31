@@ -4,12 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Register Vehicles" Height="600" Width="300
-        " ResizeMode="NoResize">
+        Title="Register Vehicles" Height="600" Width="350" ResizeMode="NoResize">
     <Grid Margin="0,0,0,0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="67*"/>
-            <ColumnDefinition Width="31*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
         <Grid.LayoutTransform>
             <TransformGroup>
@@ -19,17 +18,16 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.LayoutTransform>
-        <Button x:Name="buttonScan" Click="ButtonScan" Content="Scan for Devices" HorizontalAlignment="Left" Margin="0,17,0,0" VerticalAlignment="Top" Width="294" Height="29" Grid.ColumnSpan="2"/>
-        <ListBox Name="DeviceList" HorizontalAlignment="Left" Height="172" Margin="0,122,0,0" VerticalAlignment="Top" Width="284" SelectionChanged="DeviceList_SelectionChanged" FontSize="11" Grid.ColumnSpan="2"
+        <Button Name="buttonScan" Click="ButtonScan" Content="Start Scan" Margin="102,17,105,0" VerticalAlignment="Top" Height="20"/>
+        <ListBox Name="DeviceList" Height="172" Margin="10,124,12,0" VerticalAlignment="Top" SelectionChanged="DeviceList_SelectionChanged" FontSize="11"
                  Grid.Column="0" HorizontalContentAlignment="Center"/>
-        <Label Grid.Column="0" Name="IpLabel" Content="Device List" HorizontalAlignment="Left" Margin="106,93,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.156,0.64"/>
-        <Button Name ="Scan" Content="Connect" Click="TryConnect" HorizontalAlignment="Left" Margin="0,365,0,0" VerticalAlignment="Top" Width="294" RenderTransformOrigin="0.481,1.932" Height="35" FontSize="14" Grid.ColumnSpan="2"
+        <Label Grid.Column="0" Name="IpLabel" Content="Device List" Margin="102,93,105,452" VerticalAlignment="Center" RenderTransformOrigin="0.156,0.64" Height="26" HorizontalAlignment="Center"/>
+        <Button Name ="Scan" Content="Connect" Click="TryConnect" Margin="201,351,50,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,1.932" Height="24" FontSize="14"
                 Grid.Column="0" />
-        <TextBox IsReadOnly="True" Name="SelectedIpBox" HorizontalAlignment="Left" Height="23" Margin="78,314,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="137" RenderTransformOrigin="0.121,0.121" Grid.ColumnSpan="2"
-                 Grid.Column="0" TextAlignment="Center"/>
-        <Button x:Name ="CancelButton" Content="Cancel" Click="ButtonScanCancel" HorizontalAlignment="Left" Margin="0,66,0,0" VerticalAlignment="Top" Width="294" Height="20" Grid.ColumnSpan="2"
+        <Button Name ="CancelButton" Content="Cancel Scan" Click="ButtonScanCancel" Margin="102,50,105,0" VerticalAlignment="Top" Height="20"
                 Grid.Column="0" />
-        <TextBox IsReadOnly="True" Name ="LogFieldReg" Margin="10,413,10,26" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" FontSize="10" Grid.ColumnSpan="2"
+        <TextBox IsReadOnly="True" Name ="LogFieldReg" Margin="10,413,12,10" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" FontSize="10"
                  Grid.Column="0" />
+        <TextBox Grid.Column="0" Name="SelectedIpBox" HorizontalAlignment="Left" Height="23" Margin="45,351,0,0" TextWrapping="Wrap" Text="IP Address" VerticalAlignment="Top" Width="120" TextAlignment="Center"/>
     </Grid>
 </Window>
