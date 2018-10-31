@@ -93,7 +93,7 @@ def move(throttle, direction):
         if (throttle > 0.0):
             picarhelper.move_forward(motor_speed)
         elif (throttle < 0.0):
-            picarhelper.move_backwards(motor_speed)
+            picarhelper.move_backward(motor_speed)
         else:
             picarhelper.stop()
 
