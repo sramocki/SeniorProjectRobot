@@ -83,7 +83,7 @@ def main():
     destroy()
 
 def move(throttle, direction):
-    motor_speed = abs(throttle)*100
+    motor_speed = int(abs(throttle)*100)
     fw_angle = fw_default+(30*(direction))
 
 
