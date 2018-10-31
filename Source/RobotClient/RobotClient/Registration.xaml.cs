@@ -190,14 +190,17 @@ namespace RobotClient
          */
         private void TryConnect(object sender, RoutedEventArgs e)
         {
-
-            var selectedDevice = DeviceList.SelectedItem.ToString();
-            var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
-
-            //This is the currently selected IP to check
-            var selectedIP = deviceStringList[index][1];
-            var selectedName = deviceStringList[index][0];
-            
+            var selectedIP = SelectedIpBox.Text;
+            var random = new Random();
+            var randomNumber = random.Next(1, 256);
+            var selectedName = "Unknown" + randomNumber;
+            if (DeviceList.SelectedItem != null)
+            {
+                var selectedDevice = DeviceList.SelectedItem.ToString();
+                var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
+                selectedIP = deviceStringList[index][1];
+                selectedName = deviceStringList[index][0];
+            }
 
             //Handle the dummy connection
             if (selectedIP == "N/A")
@@ -206,6 +209,13 @@ namespace RobotClient
                 var dummyConnection = new DummyConnection(selectedName, selectedIP);
                 _mainWindow.deviceListMain.Add(dummyConnection);
             }
+
+            if (!CheckIfValidIP(selectedIP))
+            {
+                LogFieldReg.AppendText("Invalid IP used, try again!\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Invalid IP used, try again!\n");
+            }
+
             else
             {
                 PiCarConnection newConnection = null;
@@ -223,17 +233,28 @@ namespace RobotClient
                 if (canConnect)
                 {
                     _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Connected to " + selectedName + " with IP: " + selectedIP + "\n");
+                    LogFieldReg.AppendText("Connected to " + selectedName + " with IP: " + selectedIP + "\n");
                     _mainWindow.deviceListMain.Add(newConnection);
                 }
                 else
                 {
                     _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
+                    LogFieldReg.AppendText("Failed to connect to " + selectedName + " with IP: " + selectedIP + "\n");
                 }
             }
 
             _mainWindow.DeviceListMn.ItemsSource = null;
             _mainWindow.DeviceListMn.ItemsSource = _mainWindow.deviceListMain;
             _mainWindow.LogField.ScrollToEnd();
+        }
+
+        private static bool CheckIfValidIP(string localIP)
+        {
+            if (string.IsNullOrWhiteSpace(localIP))
+                return false;
+
+            var temp = localIP.Split('.');
+            return temp.Length == 4 && temp.All(r => byte.TryParse(r, out var tempForParsing));
         }
     }
 }

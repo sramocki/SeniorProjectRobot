@@ -291,10 +291,13 @@ namespace RobotClient
         private void Shutdown_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
-                    MessageBoxImage.Question) ==
-                MessageBoxResult.Yes)
-
+                    MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+                picar.SetMotion(0.0, 0.0);
+                picar.SetMode(ModeRequest.Types.Mode.Idle);
                 Application.Current.Shutdown();
+            }        
         }
 
         /**
