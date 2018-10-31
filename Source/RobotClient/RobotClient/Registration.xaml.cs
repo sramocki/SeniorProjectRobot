@@ -74,6 +74,7 @@ namespace RobotClient
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
             deviceStringList.Clear();
+            DeviceList.ItemsSource = null;
             deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
             deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
             deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
@@ -174,7 +175,8 @@ namespace RobotClient
          */
         private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (DeviceList.SelectedItem == null)
+                return;
             var deviceString = DeviceList.SelectedItem.ToString();
             Console.WriteLine(deviceString);
             var index = deviceStringList.FindIndex(array => array[0] == deviceString);
