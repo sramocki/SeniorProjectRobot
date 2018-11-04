@@ -293,9 +293,7 @@ namespace RobotClient
             if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
                     MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-                picar.SetMotion(0.0, 0.0);
-                picar.SetMode(ModeRequest.Types.Mode.Idle);
+
                 Application.Current.Shutdown();
             }        
         }
@@ -305,12 +303,20 @@ namespace RobotClient
          */
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            //TODO add saving confirmation of log data
-            if (MessageBox.Show("Do you want to close this program", "Confirmation", MessageBoxButton.YesNo,
-                    MessageBoxImage.Question) ==
-                MessageBoxResult.Yes)
 
-                Application.Current.Shutdown();
+                foreach (var t in DeviceListMn.Items)
+                {
+                    if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
+                    {
+
+                    Console.WriteLine(temp.Name + " is stopping");
+                        temp.StopStream();
+                        temp.SetMotion(0.0, 0.0);
+                        temp.SetMode(ModeRequest.Types.Mode.Idle);
+                    }
+                }
+
+            Application.Current.Shutdown();
         }
 
         /**
