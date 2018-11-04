@@ -9,20 +9,20 @@
         <Grid.Resources>
             <Style TargetType="Button">
                 <Setter Property="Background" Value="LightGray" />
-                <Setter Property="Foreground" Value="DarkRed" />
+                <Setter Property="Foreground" Value="black" />
             </Style>
 
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="DarkRed" />
+                <Setter Property="Foreground" Value="black" />
             </Style>
 
             <Style TargetType="ListBox">
-                <Setter Property="Foreground" Value="DarkRed" />
+                <Setter Property="Foreground" Value="black" />
                 <Setter Property="Background" Value="Beige" />
             </Style>
 
             <Style TargetType="TextBox">
-                <Setter Property="Foreground" Value="DarkRed" />
+                <Setter Property="Foreground" Value="Black" />
                 <Setter Property="Background" Value="Beige" />
             </Style>
         </Grid.Resources>
