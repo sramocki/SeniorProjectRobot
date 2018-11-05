@@ -13,6 +13,7 @@ namespace RobotClient
         private class PiCarClient
         {
             private readonly PiCar.PiCarClient _client;
+
             private readonly MainWindow _mainWindow = (MainWindow)Application.Current.MainWindow;
 
             public PiCarClient(PiCar.PiCarClient client)
@@ -199,5 +200,9 @@ namespace RobotClient
         }
 
         public override void SetMotion(double throttle, double direction){}
+
+        public override Task StartStream() { return null;  }
+
+        public override void StopStream() { }
     }
 }

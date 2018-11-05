@@ -8,24 +8,52 @@
         mc:Ignorable="d"
         Closing="Window_Closing"
         Title="Robot Client" Height="800" Width="800" ResizeMode="NoResize">
-    <Grid>
+    <Grid Background="Beige">
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="LightGray" />
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+ 
 
+            <Style TargetType="RepeatButton">
+                <Setter Property="Background" Value="LightGray" />
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+
+            <Style TargetType="Label">
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+
+            <Style TargetType="ListBox">
+                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="Background" Value="Beige" />
+            </Style>
+
+            <Style TargetType="TextBox">
+                <Setter Property="Foreground" Value="black" />
+                <Setter Property="Background" Value="Beige" />
+            </Style>
+        </Grid.Resources>
         <TextBox IsReadOnly="True" Name ="LogField" Margin="50,527,53,67" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2"/>
-        <Menu Margin="0,0,0,740" VerticalAlignment="Center" Grid.ColumnSpan="2" Height="31">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Register Vehicles" InputGestureText="Ctrl + R" Click="Register_Click" />
-                <MenuItem Header="_Import Log" InputGestureText="Ctrl + I" Click="ImportData_Click" />
-                <MenuItem Header="_Export Log" InputGestureText="Ctrl + U" Click="ExportLog_Click" />
-                <MenuItem Header="_Quit" InputGestureText="Alt + F4" Click="Shutdown_Click" />
-            </MenuItem>
-            <MenuItem Header="_Help" Height="31">
-                <MenuItem Header="_About" Click="About_Click" />
-            </MenuItem>
-        </Menu>
-        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Forward" Click="ButtonPress_Event" Content="↑" HorizontalAlignment="Left" Margin="386,397,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
-        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Backwards" Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="386,475,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
-        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Left" Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="342,436,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
-        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="430,436,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" FontSize="24" Height="39"/>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Register Vehicles" InputGestureText="Ctrl + R" Click="Register_Click" />
+                    <MenuItem Header="_Import Log" InputGestureText="Ctrl + I" Click="ImportData_Click" />
+                    <MenuItem Header="_Export Log" InputGestureText="Ctrl + U" Click="ExportLog_Click" />
+                    <MenuItem Header="_Quit" InputGestureText="Alt + F4" Click="Shutdown_Click" />
+                </MenuItem>
+                <MenuItem Header="_Help" Height="31">
+                    <MenuItem Header="_About" Click="About_Click" />
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Forward" Click="ButtonPress_Event" Content="↑" HorizontalAlignment="Left" Margin="386,414,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Backwards" Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="386,453,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Left" Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="342,453,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
+        <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="430,453,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" FontSize="24" Height="39"/>
         <MediaElement Margin="297,116,259,409" OpacityMask="#FFFD1313" Grid.ColumnSpan="2" Grid.Column="0"></MediaElement>
         <Rectangle Fill="#FFD0D0EC" Margin="298,117,259,409" Stroke="Black" Grid.ColumnSpan="2" Grid.Column="0" />
         <ListBox Grid.Column="0" Name="DeviceListMn"  HorizontalAlignment="Left" Height="291" Margin="24,107,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Single"/>
