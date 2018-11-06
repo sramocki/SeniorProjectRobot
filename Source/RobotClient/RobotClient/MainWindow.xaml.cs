@@ -113,10 +113,18 @@ namespace RobotClient
          */
         private void ExportLog_Click(object sender, RoutedEventArgs e)
         {
-            //TODO Make the Log Export to the Application Path and Work a Time Stamp into Log Export's file Name
-            var documentsLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var filename = "Log " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + ".txt";
-            File.WriteAllText(Path.Combine(documentsLocation, filename), LogField.Text);
+            try
+            {
+                //TODO Make the Log Export to the Application Path and Work a Time Stamp into Log Export's file Name
+                var documentsLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                var filename = "Log " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + ".txt";
+                File.WriteAllText(Path.Combine(documentsLocation, filename), LogField.Text);
+            }
+            catch(IOException exception)
+            {
+                MessageBox.Show("Problem exporting log data " + exception.ToString(), "Error!");  
+            }
+
         }
 
         /**
@@ -124,13 +132,21 @@ namespace RobotClient
          */
         private void ImportData_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new Microsoft.Win32.OpenFileDialog
+            try
             {
-                DefaultExt = ".txt"
-            };
-            var result = dlg.ShowDialog();
-            if (result != true) return;
-            LogField.Text = File.ReadAllText(dlg.FileName);
+                var dlg = new Microsoft.Win32.OpenFileDialog
+                {
+                    DefaultExt = ".txt"
+                };
+                var result = dlg.ShowDialog();
+                if (result != true) return;
+                LogField.Text = File.ReadAllText(dlg.FileName);
+            }
+            catch(IOException exception)
+            {
+                MessageBox.Show("Problem importing log data " + exception.ToString(), "Error!");
+            }
+
         }
 
         /**
@@ -317,13 +333,20 @@ namespace RobotClient
 
                 foreach (var t in DeviceListMn.Items)
                 {
-                    if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
+                    try
                     {
+                        if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
+                        {
 
-                    Console.WriteLine(temp.Name + " is stopping");
-                        temp.StopStream();
-                        temp.SetMotion(0.0, 0.0);
-                        temp.SetMode(ModeRequest.Types.Mode.Idle);
+                            LogField.AppendText(DateTime.Now + ":\t" + temp.Name + " is stopping");
+                            temp.StopStream();
+                            temp.SetMotion(0.0, 0.0);
+                            temp.SetMode(ModeRequest.Types.Mode.Idle);
+                        }
+                    }
+                    catch(Exception exception)
+                    {
+                    LogField.AppendText(DateTime.Now + ":\tSomething went wrong: " + exception.ToString());
                     }
                 }
 
@@ -335,26 +358,36 @@ namespace RobotClient
          */
         private async void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-            //Stop the stream of the previously selected event
-            foreach (PiCarConnection oldPicar in e.RemovedItems)
+            try
             {
+                //Stop the stream of the previously selected event
+                foreach (PiCarConnection oldPicar in e.RemovedItems)
+                {
 
-                oldPicar.StopStream();
+                    oldPicar.StopStream();
+                }
+            }
+            catch(Exception exception)
+            {
+                //TODO Remove vehicles that throw exceptions
+                LogField.AppendText(DateTime.Now + ":\tSomething went wrong " + exception.ToString());
             }
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
 
-            Console.WriteLine("Selected " + picar);
-
-            var streamTask = picar.StartStream();
-            try { 
+            try
+            {
+                var streamTask = picar.StartStream();
                 await streamTask;
             }
             catch (NullReferenceException nre)
             {
-                Console.WriteLine("Exception??? " + nre);
+                LogField.AppendText(DateTime.Now + ":\tSomething went wrong " + nre.ToString());
+            }
+            catch(Exception exception)
+            {
+                LogField.AppendText(DateTime.Now + ":\tSomething went wrong " + exception.ToString());
             }
 
             //Update ipBox and deviceStatus with it's info
@@ -370,7 +403,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
-            Console.WriteLine("Setting " + picar + "as Leader");
+            LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "as Leader");
 
             //Send message to picar to change modes
             picar.SetMode(ModeRequest.Types.Mode.Lead);
@@ -386,7 +419,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
-            Console.WriteLine("Setting " + picar + "as Follower");
+            LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "as Follower");
 
             //Send message to picar to change modes
             picar.SetMode(ModeRequest.Types.Mode.Follow);
@@ -402,7 +435,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
-            Console.WriteLine("Setting " + picar + "as Idle");
+            LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "as Idle");
 
             //Send message to picar to change modes
             picar.SetMode(ModeRequest.Types.Mode.Idle);
