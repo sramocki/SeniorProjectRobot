@@ -53,15 +53,24 @@ namespace RobotClient
             //Finds default gateway IP
             DeviceList.ItemsSource = null;
             DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
-            foreach (var curInterface in NetworkInterface.GetAllNetworkInterfaces())
+            try
             {
-                if (curInterface.OperationalStatus != OperationalStatus.Up) continue;
-                foreach (var gatewayOutput in curInterface.GetIPProperties()
-                    .GatewayAddresses)
+                foreach (var curInterface in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    _defaultGateway = gatewayOutput.Address.ToString();
+                    if (curInterface.OperationalStatus != OperationalStatus.Up) continue;
+                    foreach (var gatewayOutput in curInterface.GetIPProperties()
+                        .GatewayAddresses)
+                    {
+                        _defaultGateway = gatewayOutput.Address.ToString();
+                    }
                 }
             }
+            catch(NetworkInformationException exception)
+            {
+                LogFieldReg.AppendText(DateTime.Now + ":\tDevice not connected to the internet! " + exception);
+                this.Close();
+            }
+            
             _defaultGateway = _defaultGateway.Substring(0, _defaultGateway.Length - 1);
             LogFieldReg.AppendText("The gateway IP is " + _defaultGateway + "x\n");
             _mainWindow.LogField.AppendText(DateTime.Now + ":\tThe gateway IP is " + _defaultGateway + "x\n");
@@ -181,8 +190,6 @@ namespace RobotClient
             Console.WriteLine(deviceString);
             var index = deviceStringList.FindIndex(array => array[0] == deviceString);
             SelectedIpBox.Text = deviceStringList[index][1];
-            Console.WriteLine(index);
-
         }
 
         /**
@@ -213,7 +220,7 @@ namespace RobotClient
             if (!CheckIfValidIP(selectedIP))
             {
                 LogFieldReg.AppendText("Invalid IP used, try again!\n");
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Invalid IP used, try again!\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\tInvalid IP used, try again!\n");
             }
 
             else
@@ -227,7 +234,11 @@ namespace RobotClient
                 }
                 catch (RpcException rpcE)
                 {
-                    Console.WriteLine(rpcE);
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + rpcE);
+                }
+                catch(Exception exception)
+                {
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + exception);
                 }
 
                 if (canConnect)
