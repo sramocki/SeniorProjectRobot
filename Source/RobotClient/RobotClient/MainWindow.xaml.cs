@@ -72,11 +72,22 @@ namespace RobotClient
          * Image update method to update video stream image asynchronously
          */
         public void UpdateStream(ImageSource image)
-        {
-            synchronizationContext.Post(new SendOrPostCallback(o =>
-            {
-                StreamImage.Source = (ImageSource)o;
-            }), image);
+		{
+        
+			try
+			{
+				synchronizationContext.Post(new SendOrPostCallback(o =>
+				{
+					StreamImage.Source = (ImageSource)o;
+				}), image);
+			}
+			
+			//TODO add specific exception cases
+			catch(Exception e)
+			{
+				Console.WriteLine("Error " + e.ToString());
+			}
+
         }
         
 
