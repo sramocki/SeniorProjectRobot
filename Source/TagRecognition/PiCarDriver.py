@@ -9,8 +9,6 @@ import socket
 import grpc
 import picar_pb2
 import picar_pb2_grpc
-#import gst
-#import pygst
 
 
 picar.setup()
@@ -34,15 +32,16 @@ mode = 0
 
 
 #det up our tag dictionary and parameter value 
-#we use tag ids 1,2,4,8
+#we use tag ids 0-3
 arDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_50)
 parameters = cv2.aruco.DetectorParameters_create()
 
 
+
+
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
-
-#frame = None
+frame = None
 roiPts = []
 inputMode = False
 
@@ -71,8 +70,6 @@ def main():
 
         # get reference to current mode
         mode = picarserver.mode
-	(grabbed, frame) = camera.read()
-	picarserver.setFrame(frame)
 
         if mode == 1:
             # leader mode
@@ -82,9 +79,8 @@ def main():
         elif mode == 2:
             # follower mode
             #print "picar set to FOLLOWER"
-            fthrottle, fdirection = tagID()
-            #print("%f, %f " % (fthrottle, fdirection))
-            move(fthrottle, fdirection)
+            throttle, direction = tagID()
+            move(throttle, direction)
              
         # else:
             # idle mode
@@ -114,38 +110,36 @@ def move(throttle, direction):
 
 #method to recognize tags
 def tagID():
-	#setting up our frame
     ret, frame = camera.read()
-	theGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#setting up our frame
+    theGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #cv2.imshow('frame', theGray)
     
-    
-	#gather the parameters of the markers  ID is important to us    
+#gather the parameters of the markers  ID is important to us    
     corners, ids, reject = cv2.aruco.detectMarkers(theGray, arDict, parameters=parameters)
     
     #Calculating the angle we need to turn the car
     #uses a system similar to permission setting to add together ids to see what direction should be turned
     if ids is not None:
          
-            idCounter = 0
-            idSize = len(ids)
-            for i in range(idSize):
-                for j in range(9):
-                    if (j == ids[i]):
-                        idCounter = idCounter + ids[i]    
-            if (idCounter == 1 or idCounter == 3 or idCounter ==7):
-                print("Left")
-				return(0.3, -1) #("left")
-            elif (idCounter == 8 or idCounter == 12 or idCounter == 14):
-                print ("Right")
-				return(0.3, 1) #("right")
-            elif (idCounter == 6):
-                return(0.3, 0) #("straight")
-            elif (idCounter == 2):
-                return(0.3, .5) #("slight right")
-            elif (idCounter == 4):
-                return(0.3, -.5) #("slight left")
+         idCounter = 0
+         idSize = len(ids)
+         for i in range(idSize):
+             for j in range(9):
+                 if (j == ids[i]):
+                     idCounter = idCounter + ids[i]    
+         if (idCounter == 1 or idCounter == 3 or idCounter ==7):
+            return(1, 60) #("left")
+         elif (idCounter == 8 or idCounter == 12 or idCounter == 14):
+            return(1, 120) #("right")
+         elif (idCounter == 6):
+            return(1, 90) #("straight")
+         elif (idCounter == 2):
+            return(1, 105) #("slight right")
+         elif (idCounter == 4):
+            return(1, 75) #("slight left")
     else:
-        return(0, 0)
+        return(0, 90)
     
 
 
@@ -172,4 +166,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt():
-        destroy(
+        destroy()
