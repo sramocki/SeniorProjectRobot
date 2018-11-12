@@ -83,6 +83,7 @@ namespace RobotClient
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
             buttonScan.IsEnabled = false;
+            Scan.IsEnabled = false;
             deviceStringList.Clear();
             DeviceList.ItemsSource = null;
             deviceStringList.Add(new[] { "Dummy1", "DummyIP", "Default" });
@@ -139,6 +140,7 @@ namespace RobotClient
                 _mainWindow.LogField.AppendText(DateTime.Now + ":\tFinsished scan: " + _ts.TotalSeconds + " seconds\n" + DateTime.Now + "\tDetected " + _devicesFound + " devices\n");
                 buttonScan.IsEnabled = true;
                 CancelButton.IsEnabled = false;
+                Scan.IsEnabled = true;
             });
 
         }
@@ -198,21 +200,30 @@ namespace RobotClient
          */
         private void TryConnect(object sender, RoutedEventArgs e)
         {
-            var selectedDevice = DeviceList.SelectedItem.ToString();
-            var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
-            bool alreadyConnected = _mainWindow.DeviceListMn.Items.Cast<PiCarConnection>().Any(item => item.Name == deviceStringList[index][0]);
-            if (alreadyConnected)
+            //Device list wasn't selected and the manual ip box was left in the default state
+            if (DeviceList.SelectedItem == null && SelectedIpBox.Equals("IP Address"))
                 return;
 
+            string selectedName;
             var selectedIP = SelectedIpBox.Text;
-            var random = new Random();
-            var randomNumber = random.Next(1, 256);
-            var selectedName = "Unknown" + randomNumber;
             if (DeviceList.SelectedItem != null)
             {
+                var selectedDevice = DeviceList.SelectedItem.ToString();
+                var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
+                if(_mainWindow.DeviceListMn.Items.Cast<PiCarConnection>().Any(item => item.Name == deviceStringList[index][0]))
+                    return;
+
                 selectedIP = deviceStringList[index][1];
                 selectedName = deviceStringList[index][0];
+
             }
+            else
+            {
+                var random = new Random();
+                var randomNumber = random.Next(1, 256);
+                selectedName = "Unknown" + randomNumber;
+            }
+
 
             //Handle the dummy connection
             if (selectedIP == "DummyIP")
@@ -240,11 +251,11 @@ namespace RobotClient
                 }
                 catch (RpcException rpcE)
                 {
-                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + rpcE);
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + rpcE + "\n");
                 }
                 catch(Exception exception)
                 {
-                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + exception);
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + exception + "\n");
                 }
 
                 if (canConnect)

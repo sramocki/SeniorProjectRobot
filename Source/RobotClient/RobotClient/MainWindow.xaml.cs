@@ -82,11 +82,14 @@ namespace RobotClient
 				}), image);
 			}
 			
-			//TODO add specific exception cases
 			catch(Exception e)
 			{
 				Console.WriteLine("Error " + e.ToString());
-			}
+                var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+                if (picar == null)
+                    return;
+                DisconnectCar();
+            }
         }
 
         /**
@@ -206,7 +209,7 @@ namespace RobotClient
             LogField.AppendText(DateTime.Now + ":\tSet follower distance to " + _distanceValue + "\n");
             LogField.ScrollToEnd();
 
-            picar.SetMotion(_throttleController,_directionController);
+            MoveVehicle(_throttleController, _directionController);
             _previousState = state;
         }
 
@@ -236,7 +239,8 @@ namespace RobotClient
 
             LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)throttleMotor + 1] + " " +
                                 directionStrings[(int)directionMotor + 1] + "\n");
-            picar.SetMotion(throttleMotor, directionMotor);
+ 
+            MoveVehicle(throttleMotor, directionMotor);
             LogField.ScrollToEnd();
         }
 
@@ -264,7 +268,7 @@ namespace RobotClient
 
             LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)throttleMotor + 1] + " " +
                                 directionString[(int)directionMotor + 1] + "\n");
-            picar.SetMotion(throttleMotor, directionMotor);
+            MoveVehicle(throttleMotor, directionMotor);
             LogField.ScrollToEnd();
         }
 
@@ -281,22 +285,22 @@ namespace RobotClient
             {
                 case "Forward":
                     LogField.AppendText(DateTime.Now + ":\tMoving forward\n");
-                    picar.SetMotion(1.0, 0.0);
+                    MoveVehicle(1.0, 0.0);
                     break;
 
                 case "Backwards":
                     LogField.AppendText(DateTime.Now + ":\tMoving backwards\n");
-                    picar.SetMotion(-1.0, 0.0);
+                    MoveVehicle(-1.0, 0.0);
                     break;
 
                 case "Left":
                     LogField.AppendText(DateTime.Now + ":\tMoving left\n");
-                    picar.SetMotion(0.0, -1.0);
+                    MoveVehicle(0.0, -1.0);
                     break;
 
                 case "Right":
                     LogField.AppendText(DateTime.Now + ":\tMoving right\n");
-                    picar.SetMotion(0.0, 1.0);
+                    MoveVehicle(0.0, 1.0);
                     break;
 
                 default:
@@ -314,7 +318,7 @@ namespace RobotClient
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             LogField.AppendText(DateTime.Now + ":\tNow In Neutral\n");
-            picar.SetMotion(0.0, 0.0);
+            MoveVehicle(0.0, 0.0);
             LogField.ScrollToEnd();
         }
 
@@ -355,24 +359,24 @@ namespace RobotClient
         private void Window_Closing(object sender, CancelEventArgs e)
         {
 
-                foreach (var t in DeviceListMn.Items)
+            foreach (var t in DeviceListMn.Items)
+            {
+                try
                 {
-                    try
+                    if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
                     {
-                        if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
-                        {
 
-                            LogField.AppendText(DateTime.Now + ":\t" + temp.Name + " is stopping");
-                            temp.StopStream();
-                            temp.SetMotion(0.0, 0.0);
-                            temp.SetMode(ModeRequest.Types.Mode.Idle);
-                        }
-                    }
-                    catch(Exception exception)
-                    {
-                    LogField.AppendText(DateTime.Now + ":\tSomething went wrong: " + exception.ToString());
+                        LogField.AppendText(DateTime.Now + ":\t" + temp.Name + " is stopping");
+                        temp.StopStream();
+                        MoveVehicle(0.0, 0.0);
+                        SetVehicleMode(ModeRequest.Types.Mode.Idle);
                     }
                 }
+                catch(Exception exception)
+                {
+                LogField.AppendText(DateTime.Now + ":\tSomething went wrong: " + exception.ToString());
+                }
+            }
 
             Application.Current.Shutdown();
         }
@@ -394,24 +398,21 @@ namespace RobotClient
             catch(Exception exception)
             {
                 //TODO Remove vehicles that throw exceptions
-                LogField.AppendText(DateTime.Now + ":\tSomething went wrong " + exception.ToString());
+                LogField.AppendText(DateTime.Now + ":\tException found when removing an old streams!\n" + e + "\n");
+                //TODO remove previous car
             }
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null) return;
-
+            if (picar == null)
+                return;
             try
             {
                 var streamTask = picar.StartStream();
                 await streamTask;
             }
-            catch (NullReferenceException nre)
+            catch (Exception exception)
             {
-                LogField.AppendText(DateTime.Now + ":\tSomething went wrong " + nre.ToString());
-            }
-            catch(Exception exception)
-            {
-                LogField.AppendText(DateTime.Now + ":\tSomething went wrong " + exception.ToString());
+                DisconnectCar();
             }
 
             //Update ipBox and deviceStatus with it's info
@@ -427,12 +428,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
-            LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "as Leader");
-
-            //Send message to picar to change modes
-            picar.SetMode(ModeRequest.Types.Mode.Lead);
-            //Update deviceStatus
-            DeviceStatus.Text = picar.Mode.ToString();
+            SetVehicleMode(ModeRequest.Types.Mode.Lead);
         }
 
         /**
@@ -443,12 +439,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
-            LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "as Follower");
-
-            //Send message to picar to change modes
-            picar.SetMode(ModeRequest.Types.Mode.Follow);
-            //Update deviceStatus
-            DeviceStatus.Text = picar.Mode.ToString();
+            SetVehicleMode(ModeRequest.Types.Mode.Follow);
         }
 
         /**
@@ -459,12 +450,7 @@ namespace RobotClient
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null) return;
-            LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "as Idle");
-
-            //Send message to picar to change modes
-            picar.SetMode(ModeRequest.Types.Mode.Idle);
-            //Update deviceStatus
-            DeviceStatus.Text = picar.Mode.ToString();
+            SetVehicleMode(ModeRequest.Types.Mode.Idle);
         }
 
         private void SelectLeaders_Click(object sender, RoutedEventArgs e)
@@ -476,6 +462,48 @@ namespace RobotClient
                     DeviceListMn.SelectedItems.Add(temp);
                 }
             }
+        }
+
+        private void MoveVehicle(double speed, double direction)
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            try
+            {
+                picar.SetMotion(speed, direction);
+            }
+            catch(Exception e)
+            {
+                DisconnectCar();
+                Console.WriteLine(e);
+            }
+        }
+
+        private void SetVehicleMode(ModeRequest.Types.Mode mode)
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            try
+            {
+                picar.SetMode(mode);
+                DeviceStatus.Text = picar.Mode.ToString();
+                LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "to " + picar.Mode.ToString() + "\n");
+            }
+            catch (Exception e)
+            {
+                DisconnectCar();
+                Console.WriteLine(e);
+            }
+        }
+
+        private void DisconnectCar()
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            if (picar.GetType() == typeof(DummyConnection))
+                return;
+
+            LogField.AppendText(DateTime.Now + ":\tVehicle stopped responding, disconnecting. \n");
+            deviceListMain.Remove(picar);
+            DeviceListMn.ItemsSource = null;
+            DeviceListMn.ItemsSource = deviceListMain;
         }
 
         #region Properties
