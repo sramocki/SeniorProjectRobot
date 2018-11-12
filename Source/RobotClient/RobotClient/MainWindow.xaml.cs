@@ -185,8 +185,29 @@ namespace RobotClient
 
             string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
             string[] directionStrings = { "and left", "", "and right" };
-            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)_throttleController + 1] + " " +
-                                directionStrings[(int)_directionController + 1] + "\n");
+
+            int temp1 = 1;
+            int temp2 = 1;
+            if (_throttleController > 0)
+            {
+                temp1 = (int)Math.Ceiling(_throttleController) + 1;
+            }
+            else if (_throttleController < 0)
+            {
+                temp1 = (int)Math.Floor(_throttleController) + 1;
+            }
+
+            if(_directionController > 0)
+            {
+                temp2 = (int)Math.Ceiling(_directionController) + 1;
+            }
+            else if(_directionController < 0)
+            {
+                temp2 = (int)Math.Floor(_directionController) + 1;
+            }
+
+            LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[temp1] + " " +
+                                directionStrings[temp2] + "\n");
             LogField.ScrollToEnd();
 
             MoveVehicle(_throttleController, _directionController);
