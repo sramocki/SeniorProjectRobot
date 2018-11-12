@@ -31,7 +31,6 @@ namespace RobotClient
         private double _directionController;
         private double _throttleController;
         private Gamepad _previousState;
-        private int _distanceValue;
 
         /**
          * Method that runs when the main window launches
@@ -160,7 +159,7 @@ namespace RobotClient
             var state = _controller.GetState().Gamepad;
             if (state.LeftThumbX.Equals(_previousState.LeftThumbX) &&
                 state.LeftTrigger.Equals(_previousState.LeftTrigger) &&
-                state.RightTrigger.Equals(_previousState.RightTrigger) && state.Buttons.Equals(_previousState.Buttons))
+                state.RightTrigger.Equals(_previousState.RightTrigger))
                 return;
 
             //_Motor1 produces either -1.0 for left or 1.0 for right motion
@@ -184,29 +183,10 @@ namespace RobotClient
             else
                 _throttleController = 0.0;
 
-            switch(state.Buttons)
-            {
-                case GamepadButtonFlags.DPadDown:
-                    _distanceValue--;
-                    break;
-
-                case GamepadButtonFlags.DPadUp:
-                    _distanceValue++;
-                    break;
-            }
-
-            if (_distanceValue < 0)
-                _distanceValue = 0;
-
-            if (_distanceValue > 10)
-                _distanceValue = 10;
-
             string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
             string[] directionStrings = { "and left", "", "and right" };
             LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[(int)_throttleController + 1] + " " +
                                 directionStrings[(int)_directionController + 1] + "\n");
-
-            LogField.AppendText(DateTime.Now + ":\tSet follower distance to " + _distanceValue + "\n");
             LogField.ScrollToEnd();
 
             MoveVehicle(_throttleController, _directionController);
@@ -319,13 +299,6 @@ namespace RobotClient
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             LogField.AppendText(DateTime.Now + ":\tNow In Neutral\n");
             MoveVehicle(0.0, 0.0);
-            LogField.ScrollToEnd();
-        }
-
-        private void DistanceSlider_DragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            _distanceValue = (int)DistanceSlider.Value;
-            LogField.AppendText(DateTime.Now + ":\tSet follower distance to " + _distanceValue + "\n");
             LogField.ScrollToEnd();
         }
 

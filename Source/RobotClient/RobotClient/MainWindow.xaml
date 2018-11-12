@@ -66,6 +66,5 @@
         <Label Content="Status" HorizontalAlignment="Left" Margin="661,379,0,0" VerticalAlignment="Top"/>
         <Button Content="Select Leaders" HorizontalAlignment="Left" Margin="66,39,0,0" VerticalAlignment="Top" Width="95" Height="26" Click="SelectLeaders_Click"/>
         <Image Name="StreamImage" HorizontalAlignment="Left" Height="245" Margin="298,117,0,0" VerticalAlignment="Top" Width="237"/>
-        <Slider Thumb.DragCompleted="DistanceSlider_DragCompleted" Name="DistanceSlider" Value = "5" TickPlacement="BottomRight" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="602,255,0,0" Height="134" Width="25" SmallChange="2"/>
     </Grid>
 </Window>
