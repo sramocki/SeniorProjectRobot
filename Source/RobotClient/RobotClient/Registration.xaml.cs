@@ -82,11 +82,12 @@ namespace RobotClient
          */
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
+            buttonScan.IsEnabled = false;
             deviceStringList.Clear();
             DeviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
-            deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
-            deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
+            deviceStringList.Add(new[] { "Dummy1", "DummyIP", "Default" });
+            //deviceStringList.Add(new[] { "Dummy2", "DummyIP", "Default" });
+            //deviceStringList.Add(new[] { "Dummy3", "DummyIP", "Default" });
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
             DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
             _ts = TimeSpan.Zero;
@@ -186,8 +187,8 @@ namespace RobotClient
         {
             if (DeviceList.SelectedItem == null)
                 return;
+            SelectedIpBox.IsReadOnly = true;
             var deviceString = DeviceList.SelectedItem.ToString();
-            Console.WriteLine(deviceString);
             var index = deviceStringList.FindIndex(array => array[0] == deviceString);
             SelectedIpBox.Text = deviceStringList[index][1];
         }
@@ -197,27 +198,32 @@ namespace RobotClient
          */
         private void TryConnect(object sender, RoutedEventArgs e)
         {
+            var selectedDevice = DeviceList.SelectedItem.ToString();
+            var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
+            bool alreadyConnected = _mainWindow.DeviceListMn.Items.Cast<PiCarConnection>().Any(item => item.Name == deviceStringList[index][0]);
+            if (alreadyConnected)
+                return;
+
             var selectedIP = SelectedIpBox.Text;
             var random = new Random();
             var randomNumber = random.Next(1, 256);
             var selectedName = "Unknown" + randomNumber;
             if (DeviceList.SelectedItem != null)
             {
-                var selectedDevice = DeviceList.SelectedItem.ToString();
-                var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
                 selectedIP = deviceStringList[index][1];
                 selectedName = deviceStringList[index][0];
             }
 
             //Handle the dummy connection
-            if (selectedIP == "N/A")
+            if (selectedIP == "DummyIP")
             {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded " + selectedName + "for testing\n");
                 var dummyConnection = new DummyConnection(selectedName, selectedIP);
                 _mainWindow.deviceListMain.Add(dummyConnection);
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Added " + selectedName + " for testing\n");
+                LogFieldReg.AppendText("Added " + selectedName + " for testing\n");
             }
 
-            if (!CheckIfValidIP(selectedIP))
+            else if (!CheckIfValidIP(selectedIP))
             {
                 LogFieldReg.AppendText("Invalid IP used, try again!\n");
                 _mainWindow.LogField.AppendText(DateTime.Now + ":\tInvalid IP used, try again!\n");
