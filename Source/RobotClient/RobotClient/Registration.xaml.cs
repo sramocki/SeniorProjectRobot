@@ -39,15 +39,14 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Constructor for Registration Window
+         * Checks for gateway IP and sets the output.
          */
         public Registration()
         {
             InitializeComponent();
             InitializeBackgroundWorker();
             _backgroundWorker1.WorkerSupportsCancellation = true;
-            
-
             CancelButton.IsEnabled = false;
 
             //Finds default gateway IP
@@ -78,7 +77,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Function for initiating IP scan
          */
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
@@ -86,9 +85,12 @@ namespace RobotClient
             Scan.IsEnabled = false;
             deviceStringList.Clear();
             DeviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy1", "DummyIP", "Default" });
+
+            //Dummy device for testing:
+            //deviceStringList.Add(new[] { "Dummy1", "DummyIP", "Default" });
             //deviceStringList.Add(new[] { "Dummy2", "DummyIP", "Default" });
             //deviceStringList.Add(new[] { "Dummy3", "DummyIP", "Default" });
+
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
             DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
             _ts = TimeSpan.Zero;
@@ -183,7 +185,7 @@ namespace RobotClient
         private void ButtonScanCancel(object sender, RoutedEventArgs e) => _backgroundWorker1.CancelAsync();
 
         /**
-         *
+         * Function for when the selected device changes in the registration window, which sets the IP text box
          */
         private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -196,7 +198,7 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Function that handles connection to the picar server, if possible and handles various cases
          */
         private void TryConnect(object sender, RoutedEventArgs e)
         {
