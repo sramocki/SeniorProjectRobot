@@ -32,6 +32,9 @@ namespace RobotClient
         private double _throttleController;
         private Gamepad _previousState;
 
+        //true is the default simulator style mode, false is RC mode
+        private bool _controlMode;
+
         /**
          * Method that runs when the main window launches
          */
@@ -49,6 +52,8 @@ namespace RobotClient
             var newKeybind = new RoutedCommand();
             newKeybind.InputGestures.Add(new KeyGesture(Key.R, ModifierKeys.Control));
             CommandBindings.Add(new CommandBinding(newKeybind, Register_Click));
+
+            _controlMode = true;
 
             //Checks if a controller is plugged into the current OS
             _controller = new Controller(UserIndex.One);
@@ -97,6 +102,7 @@ namespace RobotClient
         private void _timer_Tick(object sender, EventArgs e)
         {
             ControllerMovement();
+
         }
 
         /**
@@ -149,43 +155,65 @@ namespace RobotClient
 
         }
 
+
+
         /**
-         * Method that handles the controller input for variable speed and direction
+         * Method that handles the simulator style input for variable speed and direction
          */
         private void ControllerMovement()
         {
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var state = _controller.GetState().Gamepad;
+
+
             if (state.LeftThumbX.Equals(_previousState.LeftThumbX) &&
+                state.LeftThumbY.Equals(_previousState.LeftThumbY) &&
+                state.RightThumbX.Equals(_previousState.RightThumbX) &&
                 state.LeftTrigger.Equals(_previousState.LeftTrigger) &&
                 state.RightTrigger.Equals(_previousState.RightTrigger))
                 return;
 
-            //_Motor1 produces either -1.0 for left or 1.0 for right motion
-            _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
-                ? 0
-                : (double)state.LeftThumbX / short.MinValue * -1;
-            _directionController = Math.Round(_directionController, 3);
+            //Default control settings (Simulator Mode)
+            if (_controlMode)
+            {
+                //_Motor1 produces either -1.0 for left or 1.0 for right motion
+                _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
+                    ? 0
+                    : (double)state.LeftThumbX / short.MinValue * -1;
+                _directionController = Math.Round(_directionController, 3);
 
-            /**
-             * These variables produce either 1.0 for forward motion, or -1 for backwards.
-             * If the values are both non-zero, then there will be no motion in either direction
-             */
-            var forwardSpeed = Math.Round(state.RightTrigger / 255.0, 3);
-            var backwardSpeed = Math.Round(state.LeftTrigger / 255.0 * -1.0, 3);
+                /**
+                 * These variables produce either 1.0 for forward motion, or -1 for backwards.
+                 * If the values are both non-zero, then there will be no motion in either direction
+                 */
+                var forwardSpeed = Math.Round(state.RightTrigger / 255.0, 3);
+                var backwardSpeed = Math.Round(state.LeftTrigger / 255.0 * -1.0, 3);
 
+                if (forwardSpeed > 0 && backwardSpeed == 0)
+                    _throttleController = forwardSpeed;
+                else if (backwardSpeed < 0 && forwardSpeed == 0)
+                    _throttleController = backwardSpeed;
+                else
+                    _throttleController = 0.0;
+            }
 
-            if (forwardSpeed > 0 && backwardSpeed == 0)
-                _throttleController = forwardSpeed;
-            else if (backwardSpeed < 0 && forwardSpeed == 0)
-                _throttleController = backwardSpeed;
+            //Alternative control settings (RC Mode)
             else
-                _throttleController = 0.0;
+            {
+                _directionController = Math.Abs((double)state.RightThumbX) < DeadzoneValue
+                    ? 0
+                    : (double)state.RightThumbX / short.MinValue * -1;
+                _directionController = Math.Round(_directionController, 3);
+
+                _throttleController = Math.Abs((double)state.LeftThumbY) < DeadzoneValue
+                    ? 0
+                    : (double)state.LeftThumbY / short.MinValue * -1;
+
+            }
 
             string[] throttleStrings = { "Moving backwards", "In Neutral", "Moving forwards" };
             string[] directionStrings = { "and left", "", "and right" };
-
             int temp1 = 1;
             int temp2 = 1;
             if (_throttleController > 0)
@@ -197,11 +225,11 @@ namespace RobotClient
                 temp1 = (int)Math.Floor(_throttleController) + 1;
             }
 
-            if(_directionController > 0)
+            if (_directionController > 0)
             {
                 temp2 = (int)Math.Ceiling(_directionController) + 1;
             }
-            else if(_directionController < 0)
+            else if (_directionController < 0)
             {
                 temp2 = (int)Math.Floor(_directionController) + 1;
             }
@@ -209,7 +237,6 @@ namespace RobotClient
             LogField.AppendText(DateTime.Now + ":\t" + throttleStrings[temp1] + " " +
                                 directionStrings[temp2] + "\n");
             LogField.ScrollToEnd();
-
             MoveVehicle(_throttleController, _directionController);
             _previousState = state;
         }
