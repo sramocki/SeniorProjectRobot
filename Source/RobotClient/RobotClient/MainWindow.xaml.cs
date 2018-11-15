@@ -184,20 +184,17 @@ namespace RobotClient
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
             if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var state = _controller.GetState().Gamepad;
-
-
-            if (state.LeftThumbX.Equals(_previousState.LeftThumbX) &&
-                state.LeftThumbY.Equals(_previousState.LeftThumbY) &&
-                state.RightThumbX.Equals(_previousState.RightThumbX) &&
-                state.LeftTrigger.Equals(_previousState.LeftTrigger) &&
-                state.RightTrigger.Equals(_previousState.RightTrigger))
-                return;
-
             //Default control settings (Simulator Mode)
             if (_controlMode)
             {
-                //_Motor1 produces either -1.0 for left or 1.0 for right motion
-                _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
+                if (state.LeftThumbX.Equals(_previousState.LeftThumbX) &&
+                    state.LeftTrigger.Equals(_previousState.LeftTrigger) &&
+                    state.RightTrigger.Equals(_previousState.RightTrigger))
+                    return;
+
+
+                    //_Motor1 produces either -1.0 for left or 1.0 for right motion
+                    _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
                     ? 0
                     : (double)state.LeftThumbX / short.MinValue * -1;
                 _directionController = Math.Round(_directionController, 3);
@@ -220,6 +217,10 @@ namespace RobotClient
             //Alternative control settings (RC Mode)
             else
             {
+                if (state.LeftThumbY.Equals(_previousState.LeftThumbY) &&
+                    state.RightThumbX.Equals(_previousState.RightThumbX))
+                    return;
+
                 _directionController = Math.Abs((double)state.RightThumbX) < DeadzoneValue
                     ? 0
                     : (double)state.RightThumbX / short.MinValue * -1;
