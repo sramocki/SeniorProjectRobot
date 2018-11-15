@@ -24,6 +24,7 @@ fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 FW_ANGLE_MAX = fw_default+30
 FW_ANGLE_MIN = fw_default-30
 
+normEdge = 20
 
 #fw.offset = 0
 #fw.turn(fw_default)
@@ -111,35 +112,26 @@ def move(throttle, direction):
 #method to recognize tags
 def tagID():
     ret, frame = camera.read()
-#setting up our frame
+    #setting up our frame
     theGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    #cv2.imshow('frame', theGray)
     
-#gather the parameters of the markers  ID is important to us    
+    
+    #gather the parameters of the markers  ID is important to us    
     corners, ids, reject = cv2.aruco.detectMarkers(theGray, arDict, parameters=parameters)
     
-    #Calculating the angle we need to turn the car
-    #uses a system similar to permission setting to add together ids to see what direction should be turned
+    
     if ids is not None:
          
-         idCounter = 0
-         idSize = len(ids)
-         for i in range(idSize):
-             for j in range(9):
-                 if (j == ids[i]):
-                     idCounter = idCounter + ids[i]    
-         if (idCounter == 1 or idCounter == 3 or idCounter ==7):
-            return(1, 60) #("left")
-         elif (idCounter == 8 or idCounter == 12 or idCounter == 14):
-            return(1, 120) #("right")
-         elif (idCounter == 6):
-            return(1, 90) #("straight")
-         elif (idCounter == 2):
-            return(1, 105) #("slight right")
-         elif (idCounter == 4):
-            return(1, 75) #("slight left")
-    else:
-        return(0, 90)
+     #CORNER LAYOUT:corner[0][corner][x][y]
+          tLeft = corners[0][0][0]
+          tRight = corners[0][0][1]
+          print(tLeft,tRight)
+          edge = tLeft - tRight
+          print(edge)
+      if(edge[0] < normEdge):
+          return (0, 0)
+      else:
+          return (1,0)
     
 
 
