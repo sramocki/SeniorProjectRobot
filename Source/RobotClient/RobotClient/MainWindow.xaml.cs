@@ -65,7 +65,7 @@ namespace RobotClient
             {
                 //Uses a timer to loop a method that checks the status of the controller
                 LogField.AppendText(DateTime.Now + ":\tController detected!\n");
-                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1/30) };
                 timer.Tick += _timer_Tick;
                 timer.Start();
                 _directionController = 0.0;
