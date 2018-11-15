@@ -39,29 +39,37 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Constructor for Registration Window
+         * Checks for gateway IP and sets the output.
          */
         public Registration()
         {
             InitializeComponent();
             InitializeBackgroundWorker();
             _backgroundWorker1.WorkerSupportsCancellation = true;
-            
-
             CancelButton.IsEnabled = false;
 
             //Finds default gateway IP
             DeviceList.ItemsSource = null;
             DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
-            foreach (var curInterface in NetworkInterface.GetAllNetworkInterfaces())
+            try
             {
-                if (curInterface.OperationalStatus != OperationalStatus.Up) continue;
-                foreach (var gatewayOutput in curInterface.GetIPProperties()
-                    .GatewayAddresses)
+                foreach (var curInterface in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    _defaultGateway = gatewayOutput.Address.ToString();
+                    if (curInterface.OperationalStatus != OperationalStatus.Up) continue;
+                    foreach (var gatewayOutput in curInterface.GetIPProperties()
+                        .GatewayAddresses)
+                    {
+                        _defaultGateway = gatewayOutput.Address.ToString();
+                    }
                 }
             }
+            catch(NetworkInformationException exception)
+            {
+                LogFieldReg.AppendText(DateTime.Now + ":\tDevice not connected to the internet! " + exception);
+                this.Close();
+            }
+            
             _defaultGateway = _defaultGateway.Substring(0, _defaultGateway.Length - 1);
             LogFieldReg.AppendText("The gateway IP is " + _defaultGateway + "x\n");
             _mainWindow.LogField.AppendText(DateTime.Now + ":\tThe gateway IP is " + _defaultGateway + "x\n");
@@ -69,15 +77,20 @@ namespace RobotClient
         }
 
         /**
-         *
+         * Function for initiating IP scan
          */
         private void ButtonScan(object sender, RoutedEventArgs e)
         {
+            buttonScan.IsEnabled = false;
+            Scan.IsEnabled = false;
             deviceStringList.Clear();
             DeviceList.ItemsSource = null;
-            deviceStringList.Add(new[] { "Dummy1", "N/A", "Default" });
-            deviceStringList.Add(new[] { "Dummy2", "N/A", "Default" });
-            deviceStringList.Add(new[] { "Dummy3", "N/A", "Default" });
+
+            //Dummy device for testing:
+            //deviceStringList.Add(new[] { "Dummy1", "DummyIP", "Default" });
+            //deviceStringList.Add(new[] { "Dummy2", "DummyIP", "Default" });
+            //deviceStringList.Add(new[] { "Dummy3", "DummyIP", "Default" });
+
             deviceStringList.Add(new[] { "Local Server", "127.0.0.1", "Default" });
             DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
             _ts = TimeSpan.Zero;
@@ -129,6 +142,7 @@ namespace RobotClient
                 _mainWindow.LogField.AppendText(DateTime.Now + ":\tFinsished scan: " + _ts.TotalSeconds + " seconds\n" + DateTime.Now + "\tDetected " + _devicesFound + " devices\n");
                 buttonScan.IsEnabled = true;
                 CancelButton.IsEnabled = false;
+                Scan.IsEnabled = true;
             });
 
         }
@@ -171,49 +185,61 @@ namespace RobotClient
         private void ButtonScanCancel(object sender, RoutedEventArgs e) => _backgroundWorker1.CancelAsync();
 
         /**
-         *
+         * Function for when the selected device changes in the registration window, which sets the IP text box
          */
         private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DeviceList.SelectedItem == null)
                 return;
+            SelectedIpBox.IsReadOnly = true;
             var deviceString = DeviceList.SelectedItem.ToString();
-            Console.WriteLine(deviceString);
             var index = deviceStringList.FindIndex(array => array[0] == deviceString);
             SelectedIpBox.Text = deviceStringList[index][1];
-            Console.WriteLine(index);
-
         }
 
         /**
-         *
+         * Function that handles connection to the picar server, if possible and handles various cases
          */
         private void TryConnect(object sender, RoutedEventArgs e)
         {
+            //Device list wasn't selected and the manual ip box was left in the default state
+            if (DeviceList.SelectedItem == null && SelectedIpBox.Equals("IP Address"))
+                return;
+
+            string selectedName;
             var selectedIP = SelectedIpBox.Text;
-            var random = new Random();
-            var randomNumber = random.Next(1, 256);
-            var selectedName = "Unknown" + randomNumber;
             if (DeviceList.SelectedItem != null)
             {
                 var selectedDevice = DeviceList.SelectedItem.ToString();
                 var index = deviceStringList.FindIndex(array => array[0] == selectedDevice);
+                if(_mainWindow.DeviceListMn.Items.Cast<PiCarConnection>().Any(item => item.Name == deviceStringList[index][0]))
+                    return;
+
                 selectedIP = deviceStringList[index][1];
                 selectedName = deviceStringList[index][0];
+
             }
+            else
+            {
+                var random = new Random();
+                var randomNumber = random.Next(1, 256);
+                selectedName = "Unknown" + randomNumber;
+            }
+
 
             //Handle the dummy connection
-            if (selectedIP == "N/A")
+            if (selectedIP == "DummyIP")
             {
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\tAdded " + selectedName + "for testing\n");
                 var dummyConnection = new DummyConnection(selectedName, selectedIP);
                 _mainWindow.deviceListMain.Add(dummyConnection);
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Added " + selectedName + " for testing\n");
+                LogFieldReg.AppendText("Added " + selectedName + " for testing\n");
             }
 
-            if (!CheckIfValidIP(selectedIP))
+            else if (!CheckIfValidIP(selectedIP))
             {
                 LogFieldReg.AppendText("Invalid IP used, try again!\n");
-                _mainWindow.LogField.AppendText(DateTime.Now + ":\t" + "Invalid IP used, try again!\n");
+                _mainWindow.LogField.AppendText(DateTime.Now + ":\tInvalid IP used, try again!\n");
             }
 
             else
@@ -227,7 +253,11 @@ namespace RobotClient
                 }
                 catch (RpcException rpcE)
                 {
-                    Console.WriteLine(rpcE);
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + rpcE + "\n");
+                }
+                catch(Exception exception)
+                {
+                    _mainWindow.LogField.AppendText(DateTime.Now + ":\tError! " + exception + "\n");
                 }
 
                 if (canConnect)
