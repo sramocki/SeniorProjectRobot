@@ -13,41 +13,32 @@ camera = cv2.VideoCapture(0)
 
 
         
-
+normEdge = 20
 
 
 
 while(True):
     
     ret, frame = camera.read()
-#setting up our frame
+    #setting up our frame
     theGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     cv2.imshow('frame', theGray)
-#gather the parameters of the markers  get size of id    
+    #gather the parameters of the markers  get size of id    
     corners, ids, reject = cv2.aruco.detectMarkers(theGray, arDict, parameters=parameters)
     
     
     
-    #Calculating the angle we need to turn the car
+    #Collsion detection
     if ids is not None:
-         print(3)
-         idCounter = 0
-         idSize = len(ids)
-         for i in range(idSize):
-             for j in range(9):
-                 if (j == ids[i]):
-                     idCounter = idCounter + ids[i]    
-         if (idCounter == 1 or idCounter == 3 or idCounter ==7):
-            print(60) #("left")
-         elif (idCounter == 8 or idCounter == 12 or idCounter == 14):
-            print(120) #("right")
-         elif (idCounter == 6):
-            print(90) #("straight")
-         elif (idCounter == 2):
-            print(105) #("slight right")
-         elif (idCounter == 4):
-            print(75) #("slight left")
-    
+     #CORNER LAYOUT:corner[0][corner][x][y]
+      tLeft = corners[0][0][0]
+      tRight = corners[0][0][1]
+      print(tLeft,tRight)
+      edge = tLeft - tRight
+      print(edge)
+      if(edge[0] < normEdge):
+         # return (0, 0)
+         print("stop")
                 
     
     
@@ -63,3 +54,4 @@ while(True):
 camera.release()
 cv2.destroyAllWindows()
 
+#[array([[[550.,  76.],[618.,  70.],[622., 144.],[548., 151.]]], dtype=float32)]
