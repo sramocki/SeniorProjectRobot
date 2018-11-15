@@ -193,10 +193,10 @@ namespace RobotClient
                     return;
 
 
-                    //_Motor1 produces either -1.0 for left or 1.0 for right motion
-                    _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
-                    ? 0
-                    : (double)state.LeftThumbX / short.MinValue * -1;
+                //_Motor1 produces either -1.0 for left or 1.0 for right motion
+                _directionController = Math.Abs((double)state.LeftThumbX) < DeadzoneValue
+                    ? 0: 
+                    (double)state.LeftThumbX / short.MinValue * -1;
                 _directionController = Math.Round(_directionController, 3);
 
                 /**
