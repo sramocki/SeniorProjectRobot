@@ -105,6 +105,25 @@ namespace RobotClient
 
         }
 
+        private void ModeChanger_Click(object sender, RoutedEventArgs e)
+        {
+            if (_controlMode)
+            {
+                _controlMode = false;
+                DefaultHeader.IsEnabled = true;
+                AlternativeHeader.IsEnabled = false;
+                LogField.AppendText(DateTime.Now + ":\tUsing RC control mode\n");
+            }
+            else
+            {
+                _controlMode = true;
+                DefaultHeader.IsEnabled = false;
+                AlternativeHeader.IsEnabled = true;
+                LogField.AppendText(DateTime.Now + ":\tUsing simulator control mode\n");
+            }
+            LogField.ScrollToEnd();
+        }
+
         /**
          * Method that opens the registration window
          */

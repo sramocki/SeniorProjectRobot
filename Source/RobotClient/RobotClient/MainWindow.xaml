@@ -42,6 +42,10 @@
                 <MenuItem Header="_Export Log" InputGestureText="Ctrl + U" Click="ExportLog_Click" />
                 <MenuItem Header="_Quit" InputGestureText="Alt + F4" Click="Shutdown_Click" />
             </MenuItem>
+            <MenuItem Header="_Options">
+                <MenuItem Header="_Default Control Mode" Name="DefaultHeader" IsEnabled="False" Click="ModeChanger_Click"/>
+                <MenuItem Header="_Alternative Control Mode" Name="AlternativeHeader" IsEnabled="True" Click="ModeChanger_Click"/>
+            </MenuItem>
             <MenuItem Header="_Help" Height="31">
                 <MenuItem Header="_About" Click="About_Click" />
             </MenuItem>
