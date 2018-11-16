@@ -7,7 +7,7 @@
         KeyUp="Key_up"
         mc:Ignorable="d"
         Closing="Window_Closing"
-        Title="Robot Client" Height="577" Width="800" ResizeMode="NoResize">
+        Title="Robot Client" Height="577" Width="800" MinHeight="577" MinWidth="800">
     <Grid Margin="0,0,0,0">
         <Grid.Resources>
             <Style TargetType="Button">
@@ -34,7 +34,7 @@
                 <Setter Property="Background" Value="White" />
             </Style>
         </Grid.Resources>
-        <TextBox IsReadOnly="True" Name ="LogField" Margin="24,326,0,0" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" Height="188" VerticalAlignment="Top" HorizontalAlignment="Left" Width="734"/>
+        <TextBox IsReadOnly="True" Name ="LogField" Margin="24,0,34,32" TextWrapping="Wrap" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" Height="188" VerticalAlignment="Bottom"/>
         <Menu DockPanel.Dock="Top" Height="32" VerticalAlignment="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Register Vehicles" InputGestureText="Ctrl + R" Click="Register_Click" />
@@ -50,26 +50,25 @@
                 <MenuItem Header="_About" Click="About_Click" />
             </MenuItem>
         </Menu>
-        <Grid Margin="618,211,0,0" Height="83" VerticalAlignment="Top" HorizontalAlignment="Left" Width="134">
+        <Grid Margin="0,0,40,252" Height="83" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="134">
             <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" x:Name="Forward" Click="ButtonPress_Event" Content="↑" Margin="44,0,46,44" FontSize="24" RenderTransformOrigin="0.462,0.778"/>
             <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" x:Name="Backwards" Click="ButtonPress_Event" Content="↓" HorizontalAlignment="Left" Margin="44,39,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
             <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" x:Name="Left" Click="ButtonPress_Event" Content="←" HorizontalAlignment="Left" Margin="0,39,0,0" VerticalAlignment="Top" Width="44" Height="39" FontSize="24"/>
             <RepeatButton Delay="10000" PreviewMouseUp="ButtonPress_Released" x:Name="Right" Click="ButtonPress_Event" Content="→" HorizontalAlignment="Left" Margin="88,39,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="1.6,2.75" FontSize="24" Height="39"/>
         </Grid>
-        <StackPanel Margin="624,52,0,0" Orientation="Vertical" HorizontalAlignment="Left" Width="129" Height="130" VerticalAlignment="Top">
+        <StackPanel Margin="0,52,39,0" Orientation="Vertical" HorizontalAlignment="Right" Width="129" Height="130" VerticalAlignment="Top">
             <Button Content="Set Leader" Click="SetLeader" HorizontalAlignment="Left" Margin="28,0,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
             <Button Content="Set Idle" Click="SetDefault" HorizontalAlignment="Left" Margin="28,0,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
             <Button Content="Set Follower" Click="SetFollower" HorizontalAlignment="Left" Margin="28,0,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.481,1.932" Height="24"/>
             <Label Content="Status" HorizontalAlignment="Left" Margin="47,0,0,0" VerticalAlignment="Top"/>
             <TextBox IsReadOnly="True" x:Name="DeviceStatus" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" TextAlignment="Center" RenderTransformOrigin="2.528,2.5"/>
         </StackPanel>
-        <Image Name="StreamImage" HorizontalAlignment="Left" Height="240" Margin="249,55,0,0" VerticalAlignment="Top" Width="320
-               "/>
-        <StackPanel Margin="24,52,0,0" Orientation="Vertical" Height="254" VerticalAlignment="Top" HorizontalAlignment="Left" Width="179">
-            <Label Content="Registered Device List" HorizontalAlignment="Left" Margin="26,0,0,0" VerticalAlignment="Top"/>
-            <ListBox x:Name="DeviceListMn"  HorizontalAlignment="Left" Height="164" VerticalAlignment="Top" Width="176" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Single"/>
-            <Label Content="Selected IP " HorizontalAlignment="Left" Margin="51,0,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.38,-1.192"/>
-            <TextBox IsReadOnly="True" x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="24,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="127" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center"/>
-        </StackPanel>
+        <Image Name="StreamImage" Margin="249,55,223,251"/>
+        <Grid Margin="24,52,0,240" HorizontalAlignment="Left" Width="179">
+            <Label Content="Registered Device List" Margin="26,0,28,0" Height="26" VerticalAlignment="Top"/>
+            <ListBox x:Name="DeviceListMn" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Single" Margin="0,26,3,64"/>
+            <Label Content="Selected IP " RenderTransformOrigin="1.38,-1.192" Margin="51,0,57,38" Height="26" VerticalAlignment="Bottom"/>
+            <TextBox IsReadOnly="True" x:Name="IpBox" TextWrapping="Wrap" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center" Margin="24,0,28,15" Height="23" VerticalAlignment="Bottom"/>
+        </Grid>
     </Grid>
 </Window>
