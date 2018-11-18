@@ -24,23 +24,31 @@ fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 FW_ANGLE_MAX = fw_default+30
 FW_ANGLE_MIN = fw_default-30
 
+
+#fw.offset = 0
+#fw.turn(fw_default)
+
 mode = 0
 
 
 #det up our tag dictionary and parameter value 
-#we use tag ids 1,2,4,8
+#we use tag ids 0-3
 arDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_50)
 parameters = cv2.aruco.DetectorParameters_create()
+
+
 
 
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
 frame = None
+roiPts = []
 inputMode = False
 
 def main():
 
     #start the server
+
     server = picarserver.getServer()
     server.start()
 
@@ -53,6 +61,7 @@ def main():
     while True:
 
         #check if key pressed
+
         k = cv2.waitKey(1) & 0xFF
 
         #if q key is pressed we break loop
@@ -61,14 +70,7 @@ def main():
 
         # get reference to current mode
         mode = picarserver.mode
-	   
-        #get the current frame
-        (grabbed, frame) = camera.read()
 
-        #draw green rectangle where baseline tag should be
-
-        
-        
         if mode == 1:
             # leader mode
             #print "picar set to LEADER"
@@ -79,7 +81,6 @@ def main():
             #print "picar set to FOLLOWER"
             throttle, direction = tagID()
             move(throttle, direction)
-            picarserver.setFrame(frame)
              
         # else:
             # idle mode
@@ -109,27 +110,36 @@ def move(throttle, direction):
 
 #method to recognize tags
 def tagID():
-	
-    #setting up our frame
-	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    ret, frame = camera.read()
+#setting up our frame
+    theGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #cv2.imshow('frame', theGray)
     
-	#gather the parameters of the markers  ID is important to us    
-    corners, ids, reject = cv2.aruco.detectMarkers(gray, arDict, parameters=parameters)
+#gather the parameters of the markers  ID is important to us    
+    corners, ids, reject = cv2.aruco.detectMarkers(theGray, arDict, parameters=parameters)
     
-
+    #Calculating the angle we need to turn the car
+    #uses a system similar to permission setting to add together ids to see what direction should be turned
     if ids is not None:
-        #CORNER LAYOUT: corner[0][corner][x][y]
-        #starts top left and moves clockwise
-        tLeft = corners[0][0][0]
-        tRight = corners[0][0][1]
-        bRight = corners[0][0][2]
-        bLeft = corners[0][0][3]
-
-        #draw rectangle around detected tag
-        cv2.rectangle(frame, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,0,255), 1)
-
+         
+         idCounter = 0
+         idSize = len(ids)
+         for i in range(idSize):
+             for j in range(9):
+                 if (j == ids[i]):
+                     idCounter = idCounter + ids[i]    
+         if (idCounter == 1 or idCounter == 3 or idCounter ==7):
+            return(1, 60) #("left")
+         elif (idCounter == 8 or idCounter == 12 or idCounter == 14):
+            return(1, 120) #("right")
+         elif (idCounter == 6):
+            return(1, 90) #("straight")
+         elif (idCounter == 2):
+            return(1, 105) #("slight right")
+         elif (idCounter == 4):
+            return(1, 75) #("slight left")
     else:
-        return(0.0, 0.0)
+        return(0, 90)
     
 
 
@@ -139,8 +149,21 @@ def destroy():
     camera.release()
     cv2.destroyAllWindows()
 
+def test():
+    print "Begin Test!"
+
+    move(0.0,0.0)
+    time.sleep(1)
+    move(0.0, 1.0)
+    time.sleep(1)
+    move(0.0, -1.0)
+    time.sleep(1)
+    move(0.0,0.0)
+    print "End Test!"
+    destroy()
+
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt():
-        destroy(
+        destroy()
