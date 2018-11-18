@@ -19,7 +19,7 @@ def main():
     while(True):
         ret, frame = camera.read()
         
-        corners = getCorners()
+        corners = getCorners(frame)
         if corners is not None:
             tLeft = corners[0][0][0]
             bRight = corners[0][0][2]
@@ -40,8 +40,6 @@ def getCorners(img):
     corners, ids, reject = cv2.aruco.detectMarkers(grayImg, arDict, parameters)
     if ids is not None:
         return corners
-    else:
-        return None
 
 if __name__ == "__main__":
     main()
