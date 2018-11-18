@@ -9,18 +9,23 @@ import cv2
 import picar_pb2
 import picar_pb2_grpc
 
+import os
+
 #Variables to control this picar's behavior
 mode = 0
 throttle = 0
 direction = 0
+image = None
 
 class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	"""Provides methods that implement functionality of PiCar server."""
 	
 	def __init__(self):
-		self.streaming = False
-		self.camera = cv2.VideoCapture(0)
-	
+		global image
+		frame = cv2.imread('init.jpg')
+		encoded, buffer = cv2.imencode('.jpg', frame)
+		image = buffer
+
 	def ReceiveConnection(self, request, context):
 		"""Handshake between PiCar and desktop application"""
 		print('Received connection request from %s' % request.message)
@@ -52,14 +57,12 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 		
 	def VideoStream(self, request, context):
 		"""Send back images captured from webcam, encoded as jpeg"""
+		global image
 		self.streaming = True
 		print('Starting video stream')
 		
 		while(self.streaming):
-			grabbed, frame = self.camera.read() #Get the current frame
-			frame = cv2.resize(frame, (640, 480)) #Resize it to 640x480
-			encoded, buffer = cv2.imencode('.jpg', frame)
-			bytes = buffer.tobytes()
+			bytes = image.tobytes()
 			
 			message = picar_pb2.ImageCapture(image=bytes) #Create message with image
 			#print('Sending frame')
@@ -78,7 +81,13 @@ def getServer():
 		PiCarServicer(), server)
 	server.add_insecure_port('[::]:50051')
 	return server
-			
+	
+def setFrame(frame):
+	"""Set the image that is sent over network from a captured webcam frame"""
+	global image
+	encoded, buffer = cv2.imencode('.jpg', frame)
+	image = buffer
+		
 if __name__ == '__main__':
 	server = getServer()
 	server.start()
