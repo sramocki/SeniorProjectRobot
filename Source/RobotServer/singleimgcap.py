@@ -22,7 +22,10 @@ def main():
         corners = getCorners(frame)
         if corners is not None:
             tLeft = corners[0][0][0]
+            tRight = corners[0][0][1]
             bRight = corners[0][0][2]
+            bLeft = corners[0][0][3]
+
             cv2.rectangle(img, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,255,0), 3)
 
         cv2.imshow('img', frame)
