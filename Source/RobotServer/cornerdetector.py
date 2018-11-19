@@ -6,7 +6,7 @@ parameters = cv2.aruco.DetectorParameters_create()
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--file", help="name of the file saved")
+    ap.add_argument("-f", "--file", help="name of the file input")
     args = vars(ap.parse_args())
 
     fileName = args["file"]
