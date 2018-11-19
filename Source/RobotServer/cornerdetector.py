@@ -18,6 +18,7 @@ def main():
         tRight = corners[0][0][1]
         bRight = corners[0][0][2]
         bLeft = corners[0][0][3]
+        print("What")
         print "Top Left: {}, {}".format(tLeft[0], tLeft[1])
         print "Top Right: {}, {}".format(tRight[0], tRight[1])
         print "Bottom Right: {}, {}".format(bRight[0], bRight[1])
