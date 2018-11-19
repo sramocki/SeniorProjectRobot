@@ -31,7 +31,7 @@ def main():
             bRight = corners[0][0][2]
             bLeft = corners[0][0][3]
 
-            cv2.rectangle(img, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,255,0), 3)
+            cv2.rectangle(img, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,255,0), 1)
 
         cv2.imshow('img', frame)
         if cv2.waitKey(1) & 0xFF == ord('y'):
