@@ -23,10 +23,10 @@ def main():
         print "Bottom Right: {}, {}".format(bRight[0], bRight[1])
         print "Bottom Left: {}, {}".format(bLeft[0], bLeft[1])
     else:
-        print "No corners detected!"
+        print ("No corners detected!")
 
 def getCorners(img):
-    grayImg = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #gather the parameters of the markers ID is important to us
     corners, ids, reject = cv2.aruco.detectMarkers(grayImg, arDict, parameters)
     if ids is not None:
