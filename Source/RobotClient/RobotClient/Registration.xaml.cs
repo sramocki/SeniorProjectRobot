@@ -32,7 +32,7 @@ namespace RobotClient
         /**
          *
          */
-        private void InitializeBackgroundWorker()
+        private void InitializeBackgroundWorker() //initalizes the backgroundworker
         {
             _backgroundWorker1.DoWork += BackgroundWorker1_DoWorkAsync;
             
@@ -46,7 +46,10 @@ namespace RobotClient
         {
             InitializeComponent();
             InitializeBackgroundWorker();
-            _backgroundWorker1.WorkerSupportsCancellation = true;
+
+
+            _backgroundWorker1.WorkerSupportsCancellation = true; //Makes the backgroundworker able to recieve cancellation requests
+
             CancelButton.IsEnabled = false;
 
             //Finds default gateway IP
@@ -102,39 +105,42 @@ namespace RobotClient
          */
         private async void BackgroundWorker1_DoWorkAsync(object sender, DoWorkEventArgs e)
         {
-            var tasks = new List<Task>();
-            _devicesFound = 0;
-            Dispatcher.Invoke(() =>
+            var tasks = new List<Task>(); //sets tasks to be a new List of Tasks
+            _devicesFound = 0; //sets devices found to 0
+            Dispatcher.Invoke(() => //making changes to the main thread
             {
                 LogFieldReg.AppendText("Starting scan\n");
                 _mainWindow.LogField.AppendText(DateTime.Now + ":\tStarting scan\n");
                 buttonScan.IsEnabled = false;
                 CancelButton.IsEnabled = true;
-            });
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
+                Scan.IsEnabled = false;
+            }); //end of current changes to the main thread
+            var stopWatch = new Stopwatch(); //wipes the stopwatch
+            stopWatch.Start(); //starts the stopwatch
 
-            for (var i = 1; i <= 255; i++)
+            for (var i = 1; i <= 255; i++) //for the entire local ip range
             {
                 _scanningIp = _defaultGateway + i;
                 var p = new Ping();
 
-                var task = AsyncUpdate(p, _scanningIp);
-                tasks.Add(task);
+                var task = AsyncUpdate(p, _scanningIp); //make a task to ping and identify the current IP
+                tasks.Add(task); //add it to the task list
 
-                if (!_backgroundWorker1.CancellationPending) continue;
-                Dispatcher.Invoke(() =>
+                if (_backgroundWorker1.CancellationPending) //if a cancellation request has been sent
                 {
-                    tasks.Clear();
-                    LogFieldReg.AppendText("Scan aborted \n");
-                    _mainWindow.LogField.AppendText("Scan aborted\n");
-                });
-                break;
+                    Dispatcher.Invoke(() =>
+                    {
+                        tasks.Clear(); //wipe the task list
+                        LogFieldReg.AppendText("Scan aborted \n");
+                        _mainWindow.LogField.AppendText("Scan aborted\n");
+                    });
+                    break; //break out of the ip for loop scan
+                }
             }
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks); //asyncronously wait for all the tasks to complete
 
-            stopWatch.Stop();
-            _ts = stopWatch.Elapsed;           
+            stopWatch.Stop(); //stop the stopwatch
+            _ts = stopWatch.Elapsed;   //assign the time it took to a variable        
 
             Dispatcher.Invoke(() =>
             {
@@ -152,24 +158,24 @@ namespace RobotClient
          */
         private async Task AsyncUpdate(Ping ping, string ip)
         {
-            var response = await ping.SendPingAsync(ip, _timeout);
+            var response = await ping.SendPingAsync(ip, _timeout); //set the response to the results of the ping
 
-            if (response.Status == IPStatus.Success)
+            if (response.Status == IPStatus.Success) //is a response is returned
             {
                 string deviceName;
                 try
                 {
-                    deviceName = Dns.GetHostEntry(ip).HostName;
+                    deviceName = Dns.GetHostEntry(ip).HostName; //try to get the device name
                 }
                 catch (SocketException eS)
                 {
-                    deviceName = "Unknown @ " + ip;
+                    deviceName = "Unknown @ " + ip; //set to unknown @ ip if failed
                     Console.WriteLine(eS);
                 }
 
                 Dispatcher.Invoke(() =>
                 {
-                    deviceStringList.Add(new[] { deviceName, ip, "Default" });
+                    deviceStringList.Add(new[] { deviceName, ip, "Default" }); //add the device to the listbox
                     DeviceList.ItemsSource = deviceStringList.Select(array => array.FirstOrDefault());
                     lock (LockObj)
                     {
@@ -182,7 +188,7 @@ namespace RobotClient
         /**
          *
          */
-        private void ButtonScanCancel(object sender, RoutedEventArgs e) => _backgroundWorker1.CancelAsync();
+        private void ButtonScanCancel(object sender, RoutedEventArgs e) => _backgroundWorker1.CancelAsync(); //cancel button sends cancellation request
 
         /**
          * Function for when the selected device changes in the registration window, which sets the IP text box
