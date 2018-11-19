@@ -12,7 +12,9 @@ def main():
     fileName = args["file"]
 
     img = cv2.imread(fileName, 0)
+
     corners = getCorners(img)
+    
     if corners is not None:
         tLeft = corners[0][0][0]
         tRight = corners[0][0][1]
@@ -23,7 +25,10 @@ def main():
         print "Top Right: {}, {}".format(tRight[0], tRight[1])
         print "Bottom Right: {}, {}".format(bRight[0], bRight[1])
         print "Bottom Left: {}, {}".format(bLeft[0], bLeft[1])
+        
         cv2.imshow("image", img)
+        cv2.waitKey(0)
+        cv2.detroyAllWindows()
     else:
         print ("No corners detected!")
 
