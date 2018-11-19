@@ -10,9 +10,9 @@ parameters = cv2.aruco.DetectorParameters_create()
 #where we define car camera;  this is for testing and needs to be updated for true implementation
 camera = cv2.VideoCapture(0)
 
+idealTagLocation = [[240,170],[380,170],[380,300],[240,300]]
 
-
-        
+idealMid = {320,240}        
 normEdge = 20
 
 
@@ -30,14 +30,40 @@ while(True):
     
     #Collsion detection
     if ids is not None:
-     #CORNER LAYOUT:corner[0][corner][x][y]
+	
+	
+	320 - 
+	
+     #CORNER LAYOUT:corner[0][0][corner#] outputs x,y of the point
+	 
+	  
+	  locDiff = idealTagLocation - corners[0][0]
+	  
+	  
       tLeft = corners[0][0][0]
       tRight = corners[0][0][1]
-      print(tLeft,tRight)
-      edge = tLeft - tRight
-      print(edge)
-      if(edge[0] < normEdge):
-         # return (0, 0)
+	  bRight = corners[0][0][2]
+	  bLeft = corners[0][0][3]
+	  
+	  
+      #calculating the edges of the tag
+	  edge01 = tRight - tLeft
+	  edge12 = tLeft - bLeft
+	  edge23 = bRight =bLeft
+	  edge03 = tRight -bRight
+	  
+	  xmid = (edge01)/2
+	  ymid = (edge03)/2
+	  
+	  tagMid = {xmid,ymid}
+	  
+	  
+	  
+	  
+      #calculating the average of one edge to use as a comparison to our baseline
+	  edge = (edge01[0] + edge12[1] + edge23[0] + edge03[1]) / 4
+      if(edge > normEdge):
+         return(-1,0)
          print("stop")
                 
     
