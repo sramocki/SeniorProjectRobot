@@ -35,8 +35,13 @@ baseTopEdge = baseTopRight - baseTopLeft
 baseRightEdge = baseBottomRight - baseTopRight
 baseBottomEdge = baseBottomRight - baseBottomLeft
 baseLeftEdge = baseBottomLeft - baseTopLeft
-
 baseAvgEdge = (baseTopEdge[0]+baseRightEdge[1]+baseBottomEdge[0]+baseLeftEdge[1])/4
+
+baseMidX = (baseTopEdge[0]/2)+baseTopLeft[0]
+baseMidY = (baseRightEdge[0]/2)+baseTopRight[1]
+baseMidPoint = (baseMidX, baseMidY)
+
+maxTagDisplacement = baseMidPoint[0]-70
 
 #det up our tag dictionary and parameter value 
 #we use tag ids 1,2,4,8
@@ -91,8 +96,7 @@ def main():
             throttle, direction = tagID()
             move(throttle, direction)
             picarserver.setFrame(frame)
-             
-        
+            
         #wait 1 second after loop    
         time.sleep(1/60)
 
@@ -102,7 +106,6 @@ def main():
 def move(throttle, direction):
     motor_speed = int(abs(throttle)*100)
     fw_angle = fw_default+(30*(direction))
-
 
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
         fw.turn(fw_angle)
@@ -119,9 +122,9 @@ def move(throttle, direction):
 def tagID():
 	
     #setting up our frame
-	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-	#gather the parameters of the markers  ID is important to us    
+    #gather the parameters of the markers  ID is important to us    
     corners, ids, reject = cv2.aruco.detectMarkers(gray, arDict, parameters=parameters)
     
 
@@ -140,16 +143,23 @@ def tagID():
         topEdge = tRight - tLeft
         rightEdge = bRight - tRight
         bottomEdge = bRight - bLeft
-        Left Edge = bLeft - tLeft
-        
+        leftEdge = bLeft - tLeft
         avgEdge = (topEdge[0] + rightEdge[1] + bottomEdge[0] + leftEdge[1])/4
         
+        tagMidX = (topEdge/2)+bLeft[0]
+        tagMidY = (rightEdge/2)+tRight[1]
+        tagMidPoint = (tagMidX, tagMidY)
+        
+        # calculates what fraction of total displacement occurs in X direction, should be number between -1.0 and 1.0
+        tagXDisplacement = tagMidPoint[0] - baseMidPoint[0]
+        tagDisplacementAmt = tagXDisplacement/maxTagDisplacement
+
         if (avgEdge < baseAvgEdge):
             #too far from leader
-            move(0.3, 0.0)
-        else if (avgEdge > baseAvgEdge):
+            move(0.3, tagDisplacementAmt)
+        elif (avgEdge > baseAvgEdge):
             #too close to leader
-            move(-0.3, 0.0)
+            move(-0.3, tagDisplacementAmt)
         else:
             return (0.0, 0.0)
 
