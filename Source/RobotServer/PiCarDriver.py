@@ -26,6 +26,17 @@ FW_ANGLE_MIN = fw_default-30
 
 mode = 0
 
+baseTopLeft = (240,170)
+baseTopRight = (380, 170)
+baseBottomRight = (380, 300)
+baseBottomLeft = (240, 300)
+
+baseTopEdge = baseTopRight - baseTopLeft
+baseRightEdge = baseBottomRight - baseTopRight
+baseBottomEdge = baseBottomRight - baseBottomLeft
+baseLeftEdge = baseBottomLeft - baseTopLeft
+
+baseAvgEdge = (baseTopEdge[0]+baseRightEdge[1]+baseBottomEdge[0]+baseLeftEdge[1])/4
 
 #det up our tag dictionary and parameter value 
 #we use tag ids 1,2,4,8
@@ -66,7 +77,7 @@ def main():
         (grabbed, frame) = camera.read()
 
         #draw green rectangle where baseline tag should be
-
+        cv2.rectangle(frame, (baseTopLeft[0], baseTopLeft[1]), (baseBottomRight[0], baseBottomRight[1]), (0,255,0), 2)
         
         
         if mode == 1:
@@ -81,9 +92,6 @@ def main():
             move(throttle, direction)
             picarserver.setFrame(frame)
              
-        # else:
-            # idle mode
-            #print "picar set to IDLE"
         
         #wait 1 second after loop    
         time.sleep(1/60)
@@ -127,6 +135,23 @@ def tagID():
 
         #draw rectangle around detected tag
         cv2.rectangle(frame, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,0,255), 1)
+        
+        #insert rest of follower code here
+        topEdge = tRight - tLeft
+        rightEdge = bRight - tRight
+        bottomEdge = bRight - bLeft
+        Left Edge = bLeft - tLeft
+        
+        avgEdge = (topEdge[0] + rightEdge[1] + bottomEdge[0] + leftEdge[1])/4
+        
+        if (avgEdge < baseAvgEdge):
+            #too far from leader
+            move(0.3, 0.0)
+        else if (avgEdge > baseAvgEdge):
+            #too close to leader
+            move(-0.3, 0.0)
+        else:
+            return (0.0, 0.0)
 
     else:
         return(0.0, 0.0)
