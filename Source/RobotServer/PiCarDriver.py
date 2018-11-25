@@ -85,7 +85,6 @@ def main():
             # leader mode
             #print "picar set to LEADER"
             move(picarserver.throttle, picarserver.direction)
-
         elif mode == 2:
             # follower mode
             #print "picar set to FOLLOWER"
@@ -94,7 +93,7 @@ def main():
         else:
             move(0.0, 0.0)
 
-        #wait 1 second after loop
+        #set frame to send to desktop
         picarserver.setFrame(frame)
         time.sleep(1/30)
 
@@ -146,8 +145,9 @@ def tagID():
         leftEdge = (bLeft[0]- tLeft[0], bLeft[1]-tLeft[1])
         avgEdge = (topEdge[0] + rightEdge[1] + bottomEdge[0] + leftEdge[1])/4
         
-        
-        
+        # calculate speed from avg edge comparison
+        speedVar = 1.0 - (avgEdge/baseAvgEdge)
+
         tagMidX = (topEdge[0]/2)+bLeft[0]
         tagMidY = (rightEdge[1]/2)+tRight[1]
         tagMidPoint = (tagMidX, tagMidY)
@@ -159,10 +159,10 @@ def tagID():
 
         if (avgEdge < baseAvgEdge-tagThreshold):
             #too far from leader, move closer
-            return(0.3, tagDisplacementAmt)
+            return(speedVar, tagDisplacementAmt)
         elif (avgEdge > baseAvgEdge+tagThreshold):
             #too close to leader, move away
-            return(-0.3, tagDisplacementAmt)
+            return(speedVar, tagDisplacementAmt)
         else:
             return (0.0, 0.0)
     else:
