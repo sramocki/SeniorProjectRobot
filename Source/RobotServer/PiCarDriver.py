@@ -9,7 +9,7 @@ import socket
 import grpc
 import picar_pb2
 import picar_pb2_grpc
-
+import numpy as np
 
 picar.setup()
 rear_wheels_enabled = True
@@ -31,14 +31,14 @@ baseTopRight = (380, 170)
 baseBottomRight = (380, 300)
 baseBottomLeft = (240, 300)
 
-baseTopEdge = baseTopRight - baseTopLeft
-baseRightEdge = baseBottomRight - baseTopRight
-baseBottomEdge = baseBottomRight - baseBottomLeft
-baseLeftEdge = baseBottomLeft - baseTopLeft
+baseTopEdge = (baseTopRight[0]-baseTopLeft[0], baseTopRight[1]-baseTopLeft[1])
+baseRightEdge = (baseBottomRight[0]-baseTopRight[0], baseBottomRight[1]-baseTopRight[1])
+baseBottomEdge = (baseBottomRight[0]-baseBottomLeft[0], baseBottomRight[1]-baseBottomLeft[1])
+baseLeftEdge = (baseBottomLeft[0]-baseTopLeft[0], baseBottomLeft[1]-baseTopLeft[1])
 baseAvgEdge = (baseTopEdge[0]+baseRightEdge[1]+baseBottomEdge[0]+baseLeftEdge[1])/4
 
 baseMidX = (baseTopEdge[0]/2)+baseTopLeft[0]
-baseMidY = (baseRightEdge[0]/2)+baseTopRight[1]
+baseMidY = (baseRightEdge[1]/2)+baseTopRight[1]
 baseMidPoint = (baseMidX, baseMidY)
 
 maxTagDisplacement = baseMidPoint[0]-70
@@ -56,6 +56,7 @@ inputMode = False
 
 def main():
 
+    global frame
     #start the server
     server = picarserver.getServer()
     server.start()
@@ -77,30 +78,26 @@ def main():
 
         # get reference to current mode
         mode = picarserver.mode
-	   
         #get the current frame
         (grabbed, frame) = camera.read()
 
-        #draw green rectangle where baseline tag should be
-        cv2.rectangle(frame, (baseTopLeft[0], baseTopLeft[1]), (baseBottomRight[0], baseBottomRight[1]), (0,255,0), 2)
-        
-        
         if mode == 1:
             # leader mode
             #print "picar set to LEADER"
             move(picarserver.throttle, picarserver.direction)
-
         elif mode == 2:
             # follower mode
             #print "picar set to FOLLOWER"
             throttle, direction = tagID()
             move(throttle, direction)
-            picarserver.setFrame(frame)
-            
-        #wait 1 second after loop    
-        time.sleep(1/60)
+        else:
+            move(0.0, 0.0)
 
-    #cleanup    
+        #set frame to send to desktop
+        picarserver.setFrame(frame)
+        time.sleep(1/30)
+
+    #cleanup
     destroy()
 
 def move(throttle, direction):
@@ -120,9 +117,10 @@ def move(throttle, direction):
 
 #method to recognize tags
 def tagID():
-	
     #setting up our frame
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    global frame
+    img = np.array(frame, dtype=np.uint8)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
     #gather the parameters of the markers  ID is important to us    
     corners, ids, reject = cv2.aruco.detectMarkers(gray, arDict, parameters=parameters)
@@ -136,36 +134,39 @@ def tagID():
         bRight = corners[0][0][2]
         bLeft = corners[0][0][3]
 
-        #draw rectangle around detected tag
-        cv2.rectangle(frame, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,0,255), 1)
+        #draw rectangle around detected tag and baseline 
+        cv2.rectangle(frame, (baseTopLeft[0],baseTopLeft[1]),(baseBottomRight[0],baseBottomRight[1]), (0,255,0), 2)
+        cv2.rectangle(frame, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,0,255), 2)
         
         #insert rest of follower code here
-        topEdge = tRight - tLeft
-        rightEdge = bRight - tRight
-        bottomEdge = bRight - bLeft
-        leftEdge = bLeft - tLeft
+        topEdge = (tRight[0]-tLeft[0], tRight[1]-tLeft[1])
+        rightEdge = (bRight[0]-tRight[0], bRight[1]-tRight[1])
+        bottomEdge = (bRight[0]-bLeft[0], bRight[1]-bLeft[1])
+        leftEdge = (bLeft[0]- tLeft[0], bLeft[1]-tLeft[1])
         avgEdge = (topEdge[0] + rightEdge[1] + bottomEdge[0] + leftEdge[1])/4
         
-        tagMidX = (topEdge/2)+bLeft[0]
-        tagMidY = (rightEdge/2)+tRight[1]
+        # calculate speed from avg edge comparison
+        speedVar = 1.0 - (avgEdge/baseAvgEdge)
+
+        tagMidX = (topEdge[0]/2)+bLeft[0]
+        tagMidY = (rightEdge[1]/2)+tRight[1]
         tagMidPoint = (tagMidX, tagMidY)
         
         # calculates what fraction of total displacement occurs in X direction, should be number between -1.0 and 1.0
         tagXDisplacement = tagMidPoint[0] - baseMidPoint[0]
         tagDisplacementAmt = tagXDisplacement/maxTagDisplacement
+        tagThreshold = 10
 
-        if (avgEdge < baseAvgEdge):
-            #too far from leader
-            move(0.3, tagDisplacementAmt)
-        elif (avgEdge > baseAvgEdge):
-            #too close to leader
-            move(-0.3, tagDisplacementAmt)
+        if (avgEdge < baseAvgEdge-tagThreshold):
+            #too far from leader, move closer
+            return(speedVar, tagDisplacementAmt)
+        elif (avgEdge > baseAvgEdge+tagThreshold):
+            #too close to leader, move away
+            return(speedVar, tagDisplacementAmt)
         else:
             return (0.0, 0.0)
-
     else:
         return(0.0, 0.0)
-    
 
 
 
@@ -178,4 +179,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt():
-        destroy(
+        destroy()
