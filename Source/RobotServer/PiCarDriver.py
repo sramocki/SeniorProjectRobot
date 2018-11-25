@@ -138,12 +138,15 @@ def tagID():
         #draw rectangle around detected tag and baseline 
         cv2.rectangle(frame, (baseTopLeft[0],baseTopLeft[1]),(baseBottomRight[0],baseBottomRight[1]), (0,255,0), 2)
         cv2.rectangle(frame, (tLeft[0],tLeft[1]),(bRight[0], bRight[1]), (0,0,255), 2)
+        
         #insert rest of follower code here
         topEdge = (tRight[0]-tLeft[0], tRight[1]-tLeft[1])
         rightEdge = (bRight[0]-tRight[0], bRight[1]-tRight[1])
         bottomEdge = (bRight[0]-bLeft[0], bRight[1]-bLeft[1])
         leftEdge = (bLeft[0]- tLeft[0], bLeft[1]-tLeft[1])
         avgEdge = (topEdge[0] + rightEdge[1] + bottomEdge[0] + leftEdge[1])/4
+        
+        
         
         tagMidX = (topEdge[0]/2)+bLeft[0]
         tagMidY = (rightEdge[1]/2)+tRight[1]
@@ -152,12 +155,13 @@ def tagID():
         # calculates what fraction of total displacement occurs in X direction, should be number between -1.0 and 1.0
         tagXDisplacement = tagMidPoint[0] - baseMidPoint[0]
         tagDisplacementAmt = tagXDisplacement/maxTagDisplacement
+        tagThreshold = 10
 
-        if (avgEdge < baseAvgEdge):
-            #too far from leader
+        if (avgEdge < baseAvgEdge-tagThreshold):
+            #too far from leader, move closer
             return(0.3, tagDisplacementAmt)
-        elif (avgEdge > baseAvgEdge):
-            #too close to leader
+        elif (avgEdge > baseAvgEdge+tagThreshold):
+            #too close to leader, move away
             return(-0.3, tagDisplacementAmt)
         else:
             return (0.0, 0.0)
