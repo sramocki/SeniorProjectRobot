@@ -22,9 +22,7 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 	
 	def __init__(self):
 		global image
-		frame = cv2.imread('init.jpg')
-		encoded, buffer = cv2.imencode('.jpg', frame)
-		image = buffer
+		image = cv2.imread('init.jpg')
 
 	def ReceiveConnection(self, request, context):
 		"""Handshake between PiCar and desktop application"""
@@ -62,12 +60,14 @@ class PiCarServicer(picar_pb2_grpc.PiCarServicer):
 		print('Starting video stream')
 		
 		while(self.streaming):
-			bytes = image.tobytes()
+			image = cv2.resize(image, (320, 240))
+			encoded, buffer = cv2.imencode('.jpg', image)
+			bytes = buffer.tobytes()
 			
 			message = picar_pb2.ImageCapture(image=bytes) #Create message with image
 			#print('Sending frame')
 			yield message #Send it				
-			sleep(1 / 30) #Wait for 1/30th of a sec
+			sleep(1 / 24) #24Hz refresh rate
 	
 	def StopStream(self, request, context):
 		"""Stop the sending of a video stream"""
@@ -85,8 +85,7 @@ def getServer():
 def setFrame(frame):
 	"""Set the image that is sent over network from a captured webcam frame"""
 	global image
-	encoded, buffer = cv2.imencode('.jpg', frame)
-	image = buffer
+	image = frame
 		
 if __name__ == '__main__':
 	server = getServer()
