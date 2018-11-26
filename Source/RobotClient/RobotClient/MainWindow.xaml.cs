@@ -370,6 +370,37 @@ namespace RobotClient
             LogField.ScrollToEnd();
         }
 
+        private async void StreamToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            if (picar == null) return;
+            try
+            {
+                var streamTask = picar.StartStream();
+                await streamTask;
+            }
+            catch (Exception exception)
+            {
+                DisconnectCar();
+                Console.WriteLine(exception);
+            }
+        }
+
+        private void StreamToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            if (picar == null) return;
+            try
+            {
+                picar.StopStream();
+            }
+            catch (Exception exception)
+            {
+                DisconnectCar();
+                Console.WriteLine(exception);
+            }
+        }
+
         /**
          * Method that opens a message box with 'About' information
          */
@@ -404,14 +435,11 @@ namespace RobotClient
             {
                 try
                 {
-                    if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
-                    {
-
-                        LogField.AppendText(DateTime.Now + ":\t" + temp.Name + " is stopping");
-                        temp.StopStream();
-                        MoveVehicle(0.0, 0.0);
-                        SetVehicleMode(ModeRequest.Types.Mode.Idle);
-                    }
+                    if (!(t is PiCarConnection temp) || temp.Mode != ModeRequest.Types.Mode.Lead) continue;
+                    LogField.AppendText(DateTime.Now + ":\t" + temp.Name + " is stopping");
+                    temp.StopStream();
+                    MoveVehicle(0.0, 0.0);
+                    SetVehicleMode(ModeRequest.Types.Mode.Idle);
                 }
                 catch(Exception exception)
                 {
@@ -425,7 +453,7 @@ namespace RobotClient
         /**
          *
          */
-        private async void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DeviceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
@@ -441,23 +469,18 @@ namespace RobotClient
                 //TODO Remove vehicles that throw exceptions
                 LogField.AppendText(DateTime.Now + ":\tException found when removing an old streams!\n" + e + "\n");
                 //TODO remove previous car
+                Console.WriteLine(exception);
             }
             //Get the picar from the device List
             var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null)
-                return;
-            try
-            {
-                var streamTask = picar.StartStream();
-                await streamTask;
-            }
-            catch (Exception exception)
-            {
-                DisconnectCar();
-            }
+            if (picar == null) return;
+
+            StreamToggle.IsEnabled = true;
+            StreamToggle.IsChecked = false;
+
 
             //Update ipBox and deviceStatus with it's info
-            IpBox.Text = picar.ipAddress;
+            IpBox.Text = picar.ipAddress.ToString();
             DeviceStatus.Text = picar.Mode.ToString();
         }
 

@@ -68,8 +68,8 @@
             <Label Content="Registered Device List" Margin="26,0,28,0" Height="26" VerticalAlignment="Top"/>
             <ListBox x:Name="DeviceListMn" SelectionChanged="DeviceList_SelectionChanged" HorizontalContentAlignment="Center" SelectionMode="Single" Margin="0,26,3,81"/>
             <Label Content="Selected IP " RenderTransformOrigin="1.38,-1.192" Margin="54,0,54,55" Height="26" VerticalAlignment="Bottom"/>
-            <TextBox IsReadOnly="True" x:Name="IpBox" TextWrapping="Wrap" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center" Margin="26,0,26,32" Height="23" VerticalAlignment="Bottom"/>
-            <CheckBox x:Name="StreamToggle" Content="Video Stream" Margin="44,0,44,12" Checked="CheckBox_Checked" Height="15" VerticalAlignment="Bottom"/>
+            <TextBox IsReadOnly="True" Name="IpBox" TextWrapping="Wrap" RenderTransformOrigin="0.908,-2.87" TextAlignment="Center" Margin="26,0,26,32" Height="23" VerticalAlignment="Bottom"/>
+            <CheckBox Name="StreamToggle" IsEnabled ="False" Content="Video Stream" Margin="44,0,44,12" Checked="StreamToggle_Checked" Unchecked="StreamToggle_Unchecked" Height="15" VerticalAlignment="Bottom"/>
         </Grid>
     </Grid>
 </Window>
