@@ -181,8 +181,8 @@ namespace RobotClient
          */
         private void ControllerMovement()
         {
-            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            //var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            //if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var state = _controller.GetState().Gamepad;
             //Default control settings (Simulator Mode)
             if (_controlMode)
@@ -266,8 +266,8 @@ namespace RobotClient
          */
         private void Key_down(object sender, KeyEventArgs e)
         {
-            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            //var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            //if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             if (e.IsRepeat) return;
 
             var directionMotor = 0.0;
@@ -297,8 +297,8 @@ namespace RobotClient
          */
         private void Key_up(object sender, KeyEventArgs e)
         {
-            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            //var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            //if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
 
             var directionMotor = 0.0;
             var throttleMotor = 0.0;
@@ -326,8 +326,8 @@ namespace RobotClient
         private void ButtonPress_Event(object sender, RoutedEventArgs e)
         {
             //TODO add button up event for stop command
-            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            //var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            //if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             var button = (RepeatButton)sender;
             switch (button.Name)
             {
@@ -363,8 +363,8 @@ namespace RobotClient
          */
         private void ButtonPress_Released(object sender, RoutedEventArgs e)
         {
-            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
+            //var picar = (PiCarConnection)DeviceListMn.SelectedItem;
+            //if (picar == null || picar.Mode != ModeRequest.Types.Mode.Lead) return;
             LogField.AppendText(DateTime.Now + ":\tNow In Neutral\n");
             MoveVehicle(0.0, 0.0);
             LogField.ScrollToEnd();
@@ -507,15 +507,20 @@ namespace RobotClient
 
         private void MoveVehicle(double speed, double direction)
         {
-            var picar = (PiCarConnection)DeviceListMn.SelectedItem;
-            try
+            foreach (var picar in deviceListMain)
             {
-                picar.SetMotion(speed, direction);
-            }
-            catch(Exception e)
-            {
-                DisconnectCar();
-                Console.WriteLine(e);
+                if (picar.Mode == ModeRequest.Types.Mode.Lead)
+                {
+                    try
+                    {
+                        picar.SetMotion(speed, direction);
+                    }
+                    catch (Exception e)
+                    {
+                        DisconnectCar();
+                        Console.WriteLine(e);
+                    }
+                }
             }
         }
 
