@@ -26,10 +26,11 @@ FW_ANGLE_MIN = fw_default-30
 
 mode = 0
 
-baseTopLeft = (240,170)
-baseTopRight = (380, 170)
-baseBottomRight = (380, 300)
-baseBottomLeft = (240, 300)
+# new rectangle will be 126,118 pixels
+baseTopLeft = (257,181)
+baseTopRight = (383, 181)
+baseBottomRight = (383, 299)
+baseBottomLeft = (257, 299)
 
 baseTopEdge = (baseTopRight[0]-baseTopLeft[0], baseTopRight[1]-baseTopLeft[1])
 baseRightEdge = (baseBottomRight[0]-baseTopRight[0], baseBottomRight[1]-baseTopRight[1])
@@ -41,7 +42,7 @@ baseMidX = (baseTopEdge[0]/2)+baseTopLeft[0]
 baseMidY = (baseRightEdge[1]/2)+baseTopRight[1]
 baseMidPoint = (baseMidX, baseMidY)
 
-maxTagDisplacement = baseMidPoint[0]-70
+maxTagDisplacement = baseMidPoint[0]-(baseTopEdge[0]/2)
 
 #det up our tag dictionary and parameter value 
 #we use tag ids 1,2,4,8
@@ -101,7 +102,7 @@ def main():
     destroy()
 
 def move(throttle, direction):
-    motor_speed = int(abs(throttle)*100)
+    motor_speed = int(abs(throttle)*30)
     fw_angle = fw_default+(30*(direction))
 
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
