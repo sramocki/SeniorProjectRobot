@@ -22,6 +22,7 @@ namespace RobotClient
         public string FollowerIP { set; get; }
 
         private readonly SynchronizationContext synchronizationContext;
+        private DispatcherTimer _timer;
 
         private string _leftAxis;
         private string _rightAxis;
@@ -65,9 +66,9 @@ namespace RobotClient
             {
                 //Uses a timer to loop a method that checks the status of the controller
                 LogField.AppendText(DateTime.Now + ":\tController detected!\n");
-                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1/30) };
-                timer.Tick += _timer_Tick;
-                timer.Start();
+                _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1/30) };
+                _timer.Tick += _timer_Tick;
+                _timer.Start();
                 _directionController = 0.0;
                 _throttleController = 0.0;
             }
@@ -80,15 +81,15 @@ namespace RobotClient
 		{
 			try
 			{
-				synchronizationContext.Post(new SendOrPostCallback(o =>
+				synchronizationContext.Post(o =>
 				{
-					StreamImage.Source = (ImageSource)o;
-				}), image);
+				    StreamImage.Source = (ImageSource)o;
+				}, image);
 			}
 			
 			catch(Exception e)
 			{
-				Console.WriteLine("Error " + e.ToString());
+				Console.WriteLine("Error " + e);
                 var picar = (PiCarConnection)DeviceListMn.SelectedItem;
                 if (picar == null)
                     return;
@@ -101,7 +102,16 @@ namespace RobotClient
          */
         private void _timer_Tick(object sender, EventArgs e)
         {
-            ControllerMovement();
+            try
+            {
+                ControllerMovement();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                LogField.AppendText(DateTime.Now + ":\tController disconnected\n");
+                _timer.Stop();
+            }
 
         }
 
