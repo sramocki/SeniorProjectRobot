@@ -15,9 +15,6 @@ picar.setup()
 rear_wheels_enabled = True
 front_wheels_enabled = True
 
-FW_ANGLE_MAX = 90+30
-FW_ANGLE_MIN = 90-30
-
 fw = front_wheels.Front_Wheels()
 fw_default = picarhelper.getDefaultAngle(socket.gethostname())
 
@@ -67,7 +64,7 @@ def main():
     print "Server Started on "+socket.gethostname()+"\n"
     print "Press Ctrl-C to quit"
 
-    move(0.0,0.0)
+    picarhelper.move(0.0,0.0)
 
     # loop unless break occurs
     while True:
@@ -87,18 +84,20 @@ def main():
         if mode == 1:
             # leader mode
             #print "picar set to LEADER"
-            move(picarserver.throttle, picarserver.direction)
+            picarhelper.move(picarserver.throttle, picarserver.direction)
         elif mode == 2:
             # follower mode
-            #print "picar set to FOLLOWER"
-            getBaseCorners()
+            #if no base corners, get corners
+            if not hasBaseCorners:
+                getBaseCorners()
+            #if we have base corners, now enter follower
             if hasBaseCorners:
                 throttle, direction = tagID()
-                move(throttle, direction)
+                picarhelper.move(throttle, direction)
             else:
                 print "Base Tag Corners Not Detected!"
         else:
-            move(0.0, 0.0)
+            picarhelper.move(0.0, 0.0)
             baseTopLeft = None
             baseTopRight = None
             baseBottomRight = None
@@ -124,20 +123,6 @@ def main():
 
     #cleanup
     destroy()
-
-def move(throttle, direction):
-    motor_speed = int(abs(throttle)*100)
-    fw_angle = fw_default+(30*(direction))
-
-    if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
-        fw.turn(fw_angle)
-    if rear_wheels_enabled:
-        if (throttle > 0.0):
-            picarhelper.move_forward(motor_speed)
-        elif (throttle < 0.0):
-            picarhelper.move_backward(motor_speed)
-        else:
-            picarhelper.stop()
 
 
 #method to recognize tags
