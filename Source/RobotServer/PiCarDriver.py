@@ -42,7 +42,7 @@ baseMidY = None
 baseMidPoint = None
 
 maxTagDisplacement = None
-hasBaseCorners = false
+hasBaseCorners = False
 
 #det up our tag dictionary and parameter value 
 #we use tag ids 1,2,4,8
@@ -59,7 +59,7 @@ def main():
     global baseTopEdge, baseRightEdge, baseBottomEdge, baseLeftEdge, baseAvgEdge
     global baseMidX, baseMidY, baseMidPoint
     global maxTagDisplacement, frame, hasBaseCorners
-    
+
     #start the server
     server = picarserver.getServer()
     server.start()
@@ -218,7 +218,7 @@ def getBaseCorners():
             baseMidY = (baseRightEdge[1]/2)+baseTopRight[1]
             baseMidPoint = (baseMidX, baseMidY)
             maxTagDisplacement = baseMidPoint[0]-(baseTopEdge[0]/2)
-            hasBaseCorners = true
+            hasBaseCorners = True
 
 
 
