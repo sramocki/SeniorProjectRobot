@@ -115,7 +115,7 @@ def main():
             baseMidPoint = None
 
             maxTagDisplacement = None
-            hasBaseCorners = false
+            hasBaseCorners = False
 
 
         #set frame to send to desktop
