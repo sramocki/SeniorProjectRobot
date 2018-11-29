@@ -1,19 +1,17 @@
 from picar import front_wheels, back_wheels
 import picar
+import socket
 
 bw = back_wheels.Back_Wheels()
 fw = front_wheels.Front_Wheels()
 
-
-
-fw_default = getDefaultAngle(socket.gethostname())
-FW_ANGLE_MAX = fw_default+30
-FW_ANGLE_MIN = fw_default-30
-
 def move(throttle, direction):
+    fw_default = getDefaultAngle(socket.gethostname())
+    FW_ANGLE_MAX = fw_default+30
+    FW_ANGLE_MIN = fw_default-30
     rear_wheels_enabled = True
     front_wheels_enabled = True
-    
+
     motor_speed = int(abs(throttle)*100)
     fw_angle = fw_default+(30*(direction))
 
