@@ -26,23 +26,23 @@ FW_ANGLE_MIN = fw_default-30
 
 mode = 0
 
-# new rectangle will be 126,118 pixels
-baseTopLeft = (257,181)
-baseTopRight = (383, 181)
-baseBottomRight = (383, 299)
-baseBottomLeft = (257, 299)
+baseTopLeft = None
+baseTopRight = None
+baseBottomRight = None
+baseBottomLeft = None
 
-baseTopEdge = (baseTopRight[0]-baseTopLeft[0], baseTopRight[1]-baseTopLeft[1])
-baseRightEdge = (baseBottomRight[0]-baseTopRight[0], baseBottomRight[1]-baseTopRight[1])
-baseBottomEdge = (baseBottomRight[0]-baseBottomLeft[0], baseBottomRight[1]-baseBottomLeft[1])
-baseLeftEdge = (baseBottomLeft[0]-baseTopLeft[0], baseBottomLeft[1]-baseTopLeft[1])
-baseAvgEdge = (baseTopEdge[0]+baseRightEdge[1]+baseBottomEdge[0]+baseLeftEdge[1])/4
+baseTopEdge = None
+baseRightEdge = None
+baseBottomEdge = None
+baseLeftEdge = None
+baseAvgEdge = None
 
-baseMidX = (baseTopEdge[0]/2)+baseTopLeft[0]
-baseMidY = (baseRightEdge[1]/2)+baseTopRight[1]
-baseMidPoint = (baseMidX, baseMidY)
+baseMidX = None
+baseMidY = None
+baseMidPoint = None
 
-maxTagDisplacement = baseMidPoint[0]-(baseTopEdge[0]/2)
+maxTagDisplacement = None
+hasBaseCorners = False
 
 #det up our tag dictionary and parameter value 
 #we use tag ids 1,2,4,8
@@ -53,11 +53,13 @@ parameters = cv2.aruco.DetectorParameters_create()
 #get a reference to the camera, default is 0
 camera = cv2.VideoCapture(0)
 frame = None
-inputMode = False
 
 def main():
+    global baseTopLeft, baseTopRight, baseBottomRight, baseBottomLeft
+    global baseTopEdge, baseRightEdge, baseBottomEdge, baseLeftEdge, baseAvgEdge
+    global baseMidX, baseMidY, baseMidPoint
+    global maxTagDisplacement, frame, hasBaseCorners
 
-    global frame
     #start the server
     server = picarserver.getServer()
     server.start()
@@ -89,10 +91,32 @@ def main():
         elif mode == 2:
             # follower mode
             #print "picar set to FOLLOWER"
-            throttle, direction = tagID()
-            move(throttle, direction)
+            getBaseCorners()
+            if hasBaseCorners:
+                throttle, direction = tagID()
+                move(throttle, direction)
+            else:
+                print "Base Tag Corners Not Detected!"
         else:
             move(0.0, 0.0)
+            baseTopLeft = None
+            baseTopRight = None
+            baseBottomRight = None
+            baseBottomLeft = None
+
+            baseTopEdge = None
+            baseRightEdge = None
+            baseBottomEdge = None
+            baseLeftEdge = None
+            baseAvgEdge = None
+
+            baseMidX = None
+            baseMidY = None
+            baseMidPoint = None
+
+            maxTagDisplacement = None
+            hasBaseCorners = False
+
 
         #set frame to send to desktop
         picarserver.setFrame(frame)
@@ -102,7 +126,7 @@ def main():
     destroy()
 
 def move(throttle, direction):
-    motor_speed = int(abs(throttle)*30)
+    motor_speed = int(abs(throttle)*100)
     fw_angle = fw_default+(30*(direction))
 
     if front_wheels_enabled and (fw_angle >= FW_ANGLE_MIN and fw_angle <= FW_ANGLE_MAX):
@@ -163,11 +187,39 @@ def tagID():
             return(speedVar, tagDisplacementAmt)
         elif (avgEdge > baseAvgEdge+tagThreshold):
             #too close to leader, move away
-            return(speedVar, tagDisplacementAmt)
+            return(-0.3, tagDisplacementAmt)
         else:
             return (0.0, 0.0)
     else:
         return(0.0, 0.0)
+
+def getBaseCorners():
+    global baseTopLeft, baseTopRight, baseBottomRight, baseBottomLeft
+    global baseTopEdge, baseRightEdge, baseBottomEdge, baseLeftEdge, baseAvgEdge
+    global baseMidX, baseMidY, baseMidPoint
+    global maxTagDisplacement, frame, hasBaseCorners
+
+    grayImg = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    corners, ids, reject = cv2.aruco.detectMarkers(grayImg, arDict, parameters=parameters)
+    if ids is not None:
+        if corners is not None:
+            baseTopLeft = corners[0][0][0]
+            baseTopRight = corners[0][0][1]
+            baseBottomRight = corners[0][0][2]
+            baseBottomLeft = corners[0][0][3]
+
+            baseTopEdge = (baseTopRight[0]-baseTopLeft[0], baseTopRight[1]-baseTopLeft[1])
+            baseRightEdge = (baseBottomRight[0]-baseTopRight[0], baseBottomRight[1]-baseTopRight[1])
+            baseBottomEdge = (baseBottomRight[0]-baseBottomLeft[0], baseBottomRight[1]-baseBottomLeft[1])
+            baseLeftEdge = (baseBottomLeft[0]-baseTopLeft[0], baseBottomLeft[1]-baseTopLeft[1])
+            baseAvgEdge = (baseTopEdge[0]+baseRightEdge[1]+baseBottomEdge[0]+baseLeftEdge[1])/4
+
+            baseMidX = (baseTopEdge[0]/2)+baseTopLeft[0]
+            baseMidY = (baseRightEdge[1]/2)+baseTopRight[1]
+            baseMidPoint = (baseMidX, baseMidY)
+            maxTagDisplacement = baseMidPoint[0]-(baseTopEdge[0]/2)
+            hasBaseCorners = True
+
 
 
 
