@@ -84,7 +84,7 @@ def main():
         if mode == 1:
             # leader mode
             #print "picar set to LEADER"
-            picarhelper.move(picarserver.throttle, picarserver.direction)
+            picarhelper.move((picarserver.throttle/2), picarserver.direction)
         elif mode == 2:
             # follower mode
             #if no base corners, get corners
