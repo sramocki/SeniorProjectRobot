@@ -402,6 +402,7 @@ namespace RobotClient
             if (picar == null) return;
             try
             {
+                UpdateStream(null);
                 picar.StopStream();
             }
             catch (Exception exception)
@@ -447,6 +448,7 @@ namespace RobotClient
                 {
                     if (!(t is PiCarConnection temp) || temp.Mode != ModeRequest.Types.Mode.Lead) continue;
                     LogField.AppendText(DateTime.Now + ":\t" + temp.Name + " is stopping");
+                    UpdateStream(null);
                     temp.StopStream();
                     MoveVehicle(0.0, 0.0);
                     SetVehicleMode(ModeRequest.Types.Mode.Idle);
@@ -470,8 +472,9 @@ namespace RobotClient
                 //Stop the stream of the previously selected event
                 foreach (PiCarConnection oldPicar in e.RemovedItems)
                 {
-
+                    UpdateStream(null);
                     oldPicar.StopStream();
+
                 }
             }
             catch(Exception exception)
