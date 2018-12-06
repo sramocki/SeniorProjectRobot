@@ -79,10 +79,15 @@ namespace RobotClient
 
         }
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            _mainWindow.Register = null;
+        }
+
         /**
          * Function for initiating IP scan
          */
-        private void ButtonScan(object sender, RoutedEventArgs e)
+            private void ButtonScan(object sender, RoutedEventArgs e)
         {
             buttonScan.IsEnabled = false;
             Scan.IsEnabled = false;

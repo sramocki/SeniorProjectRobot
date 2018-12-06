@@ -9,16 +9,14 @@ using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using SharpDX.XInput;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
 
 namespace RobotClient
 {
     public partial class MainWindow
     {
-        private Window _register;
+        public Window Register;
         public List<PiCarConnection> deviceListMain = new List<PiCarConnection>();
         public string LeaderIp { set; get; }
         public string FollowerIP { set; get; }
@@ -141,16 +139,15 @@ namespace RobotClient
          */
         private void Register_Click(object sender, RoutedEventArgs e)
         {
-            if (_register == null)
+            if (Register == null)
             {
-                _register = new Registration();
-                _register.Show();
+                Register = new Registration();
+                Register.Show();
             }
             else
             {
-                _register.Focus();
+                Register.Focus();
             }
-
         }
 
         /**
