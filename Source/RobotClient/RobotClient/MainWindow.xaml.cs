@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using SharpDX.XInput;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
@@ -17,6 +18,7 @@ namespace RobotClient
 {
     public partial class MainWindow
     {
+        private Window _register;
         public List<PiCarConnection> deviceListMain = new List<PiCarConnection>();
         public string LeaderIp { set; get; }
         public string FollowerIP { set; get; }
@@ -139,8 +141,16 @@ namespace RobotClient
          */
         private void Register_Click(object sender, RoutedEventArgs e)
         {
-            var register = new Registration();
-            register.Show();
+            if (_register == null)
+            {
+                _register = new Registration();
+                _register.Show();
+            }
+            else
+            {
+                _register.Focus();
+            }
+
         }
 
         /**
@@ -159,7 +169,6 @@ namespace RobotClient
             {
                 MessageBox.Show("Problem exporting log data " + exception.ToString(), "Error!");  
             }
-
         }
 
         /**
@@ -183,8 +192,6 @@ namespace RobotClient
             }
 
         }
-
-
 
         /**
          * Method that handles the simulator style input for variable speed and direction
@@ -530,17 +537,6 @@ namespace RobotClient
             SetVehicleMode(ModeRequest.Types.Mode.Idle);
         }
 
-        private void SelectLeaders_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (var t in DeviceListMn.Items)
-            {
-                if (t is PiCarConnection temp && temp.Mode == ModeRequest.Types.Mode.Lead)
-                {
-                    DeviceListMn.SelectedItems.Add(temp);
-                }
-            }
-        }
-
         private void MoveVehicle(double speed, double direction)
         {
             foreach (var picar in deviceListMain)
@@ -568,6 +564,7 @@ namespace RobotClient
                 picar.SetMode(mode);
                 DeviceStatus.Text = picar.Mode.ToString();
                 LogField.AppendText(DateTime.Now + ":\tSetting " + picar + "to " + picar.Mode.ToString() + "\n");
+                LogField.ScrollToEnd();
             }
             catch (Exception e)
             {
@@ -583,6 +580,7 @@ namespace RobotClient
                 return;
 
             LogField.AppendText(DateTime.Now + ":\tVehicle stopped responding, disconnecting. \n");
+            LogField.ScrollToEnd();
             deviceListMain.Remove(picar);
             DeviceListMn.ItemsSource = null;
             DeviceListMn.ItemsSource = deviceListMain;
