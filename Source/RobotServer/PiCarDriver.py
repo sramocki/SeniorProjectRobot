@@ -172,7 +172,7 @@ def tagID():
             return(speedVar, tagDisplacementAmt)
         elif (avgEdge > baseAvgEdge+tagThreshold):
             #too close to leader, move away
-            return(-0.3, tagDisplacementAmt)
+            return(-0.3, -tagDisplacementAmt)
         else:
             return (0.0, 0.0)
     else:
